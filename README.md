@@ -1,2 +1,3 @@
 # mlearn
-Benchmark Suite for Machine Learning Interatomic Potentials for Materials
+
+mlearn is a benchmark suite for machine learning interatomic potentials for materials science.

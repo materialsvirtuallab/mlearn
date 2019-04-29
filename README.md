@@ -1,3 +1,130 @@
 # mlearn
 
-mlearn is a benchmark suite for machine learning interatomic potentials for materials science.
+The mlearn package is a benchmark suite for machine learning interatomic 
+potentials for materials science. It enables a seamless way to develop 
+various potentials (
+[Guassian Approximation Potential](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.104.136403), 
+[Moment Tensor Potential](https://epubs.siam.org/doi/abs/10.1137/15M1054183), 
+[Neural Network Potential](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.146401),
+[Spectral Neighbor Analysis Potential](https://www.sciencedirect.com/science/article/pii/S0021999114008353)) 
+and provides LAMMPS-driven properties predictor with developed potentials as plugins.
+
+# Installation
+
+The usage of mlearn requires installation of specific packages and the plugins in 
+[LAMMPS](https://lammps.sandia.gov/).
+
+* Gaussian Approximation Potential (GAP)
+
+    Clone the [QUIP](https://github.com/libAtoms/QUIP) repository with `--recursive` mode 
+    from GitHub.
+    ```
+    git clone --recursive https://github.com/libAtoms/QUIP.git
+    ```
+    Define the environment variable `QUIP_ROOT` as the path of QUIP repository.
+    ```
+    cd QUIP
+    export QUIP_ROOT=${PWD}
+    ```
+    Decide your architecture by looking in the `${QUIP_ROOT}/arch/` directory and define the 
+    environmental variable `QUIP_ARCH`, e.g,
+    ```
+    export QUIP_ARCH=linux_x86_64_gfortran
+    ```
+    Make sure `QUIP_ROOT` and `QUIP_ARCH` are in environment path for further 
+    auto-detection of building LAMMPS.
+     
+    Define the environment variable `QUIP_INSTALLDIR` and add it into the environment path. 
+    When the compilation and installation finishes, all compiled programs will be copied 
+    to `QUIP_INSTALLDIR`.
+    ```
+    export QUIP_INSTALLDIR=`somewhere_for_executables`
+    ```
+    Obtain the support for Gaussian Approximation Potential from 
+    [GAP](http://www.libatoms.org/gap/gap_download.html), extract the codes in 
+    `${QUIP_ROOT}\src` directory.
+    
+    Customise QUIP, set the maths libraries and provide linking options. (It will ask some 
+    questions, make sure answer yes to compile with **GAP** prediction and training support).
+    ```
+    make config
+    ```
+    
+    Compile all programs, modules and libraries.
+    ```
+    make
+    ```
+    
+    Copies all compiled programs to `QUIP_INSTALLDIR`.
+    ```
+    make install
+    ```
+    
+    Compile QUIP as a library and link to it, this will create a library 
+    `build/${QUIP_ARCH}/libquip.a`.
+    ```
+    make libquip
+    ```
+    
+    Clone the LAMMPS repository from GitHub. (if LAMMPS package has already been installed, 
+    skip this step).
+    ```
+    git clone git@github.com:lammps/lammps.git
+    ```
+    
+    Assume `LMP_ROOT` is the path of LAMMPS package, enable the interface neccessary to 
+    use QUIP potentials in `${LMP_ROOT}/src` directory.
+    ```
+    make yes-user-quip
+    ```
+    
+    The serial version of LAMMPS containing QUIP interface can then be installed. 
+    (Please refer to [LAMMPS website](https://lammps.sandia.gov/) for the installation 
+    of other versions.)
+    ```
+    make serial
+    ```
+    An example is provided in `mlearn/notebooks/GAP_example/example.ipynb`.
+
+* Moment Tensor Potential (MTP)
+
+    Clone the [MLIP](http://gitlab.skoltech.ru/shapeev/mlip-dev) from GitLab. The repository 
+    is under development, please refer to [Alex Shapeev](http://www.shapeev.com) for access to
+    the repository.
+    ```
+    git clone http://gitlab.skoltech.ru/shapeev/mlip-dev.git
+    ```
+    
+    Assume `MLIP_ROOT` is the path of MLIP package. Configure the MLIP package build in 
+    `${MLIP_ROOT}` directory.
+    ```
+    ./configure
+    ```
+    
+    Compile and build the MLIP executable and add the `${MLIP_ROOT}/bin` in environment path.
+    ```
+    make mlp
+    ```
+    
+    Clone the LAMMPS repository from GitHub. (if LAMMPS package has already been installed, 
+    skip this step).
+    ```
+    git clone git@github.com:lammps/lammps.git
+    ```
+    
+    Assume `LMP_ROOT` is the path of LAMMPS package. Configure MLIP to be used within LAMMPS
+    in `${MLIP_ROOT}` directory.
+    ```
+    ./configure --lammps=${LMP_ROOT}
+    ```
+    
+    Install LAMMPS with MLIP interface in `${MLIP_ROOT}` directory.
+    ```
+    make lammps
+    ```
+    An example is provided in `mlearn/notebooks/MTP_example/example.ipynb`.
+
+* Neural Network Potential (NNP)
+
+
+* Spectral Neighbor Analysis Potential (SNAP)

@@ -471,17 +471,19 @@ class MTPotential(Potential):
                     error_msg += msg[-1]
                 raise RuntimeError(error_msg)
 
-            param = OrderedDict()
-            with open(save_fitted_mtp, 'r') as f:
-                lines = f.readlines()
-            param['safe'] = [line.rstrip() for line in lines[:-2]]
-            # param['safe'] = [line.rstrip() for line in lines[:-2] if not line.startswith('scaling')]
-            for line in lines[-2:]:
-                key = line.rstrip().split(' = ')[0]
-                value = json.loads(
-                    line.rstrip().split(' = ')[1].replace('{', '[').replace('}', ']'))
-                param[key] = value
-            self.param = param
+            def load_config(filename):
+                param = OrderedDict()
+                with open(filename, 'r') as f:
+                    lines = f.readlines()
+                param['safe'] = [line.rstrip() for line in lines[:-2]]
+                for line in lines[-2:]:
+                    key = line.rstrip().split(' = ')[0]
+                    value = json.loads(
+                        line.rstrip().split(' = ')[1].replace('{', '[').replace('}', ']'))
+                    param[key] = value
+                return param
+
+            self.param = load_config(save_fitted_mtp)
         return rc
 
     def write_param(self, fitted_mtp='fitted.mtp', **kwargs):
@@ -590,7 +592,7 @@ class MTPotential(Potential):
         return filename
 
     @staticmethod
-    def from_file(filename):
+    def from_config(filename):
         """
         Initialize potential with parameters file.
 
@@ -600,6 +602,21 @@ class MTPotential(Potential):
         Returns:
             MTPotential
         """
-        with open(filename) as f:
-            param = yaml.load(f)
-        return MTPotential(param)
+        if filename.endswith('.yaml'):
+            with open(filename) as f:
+                param = yaml.load(f)
+            return MTPotential(param)
+        if filename.endswith('.mtp'):
+            def load_config(filename):
+                param = OrderedDict()
+                with open(filename, 'r') as f:
+                    lines = f.readlines()
+                param['safe'] = [line.rstrip() for line in lines[:-2]]
+                for line in lines[-2:]:
+                    key = line.rstrip().split(' = ')[0]
+                    value = json.loads(
+                        line.rstrip().split(' = ')[1].replace('{', '[').replace('}', ']'))
+                    param[key] = value
+                return param
+            param = load_config(filename)
+            return MTPotential(param=param)

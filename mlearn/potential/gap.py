@@ -419,7 +419,7 @@ class GAPotential(Potential):
         return filename
 
     @staticmethod
-    def from_config(filename, specie):
+    def from_config(filename):
         """
         Initialize potential with parameters file.
 

@@ -38,7 +38,7 @@ The usage of mlearn requires installation of specific packages and the plugins i
     When the compilation and installation finishes, all compiled programs will be copied 
     to `QUIP_INSTALLDIR`.
     ```
-    export QUIP_INSTALLDIR=`somewhere_for_executables`
+    export QUIP_INSTALLDIR=<path_for_executables>
     ```
     Obtain the support for Gaussian Approximation Potential from 
     [GAP](http://www.libatoms.org/gap/gap_download.html), extract the codes in 

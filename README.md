@@ -21,7 +21,7 @@ in [LAMMPS](https://lammps.sandia.gov/). Please see
 
 # References
 
-* [Gaussian Approximation Potential](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.104.136403), 
-* [Moment Tensor Potential](https://epubs.siam.org/doi/abs/10.1137/15M1054183), 
-* [Neural Network Potential](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.146401),
+* Gaussian Approximation Potential: Bartók, A. P.; Payne, M. C.; Kondor, R.; Csányi, G. Gaussian Approximation Potentials: The Accuracy of Quantum Mechanics, without the Electrons. Physical Review Letters 2010, 104, 136403, [doi:10.1103/PhysRevLett.104.136403](https://doi.org/10.1103/PhysRevLett.104.136403).
+* [Moment Tensor Potential](https://epubs.siam.org/doi/abs/10.1137/15M1054183)
+* [Neural Network Potential](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.146401)
 * [Spectral Neighbor Analysis Potential](https://www.sciencedirect.com/science/article/pii/S0021999114008353)

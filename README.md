@@ -14,7 +14,7 @@ and provides LAMMPS-driven properties predictor with developed potentials as plu
 The usage of mlearn requires installation of specific packages and the plugins in 
 [LAMMPS](https://lammps.sandia.gov/).
 
-* Gaussian Approximation Potential (GAP)
+* **Gaussian Approximation Potential (GAP)**
 
     Clone the [QUIP](https://github.com/libAtoms/QUIP) repository with `--recursive` mode 
     from GitHub.
@@ -86,7 +86,7 @@ The usage of mlearn requires installation of specific packages and the plugins i
     ```
     An example is provided in `mlearn/notebooks/GAP_example/example.ipynb`.
 
-* Moment Tensor Potential (MTP)
+* **Moment Tensor Potential (MTP)**
 
     Clone the [MLIP](http://gitlab.skoltech.ru/shapeev/mlip-dev) from GitLab. The repository 
     is under development, please refer to [Alex Shapeev](http://www.shapeev.com) for access to
@@ -124,7 +124,7 @@ The usage of mlearn requires installation of specific packages and the plugins i
     ```
     An example is provided in `mlearn/notebooks/MTP_example/example.ipynb`.
 
-* Neural Network Potential (NNP)
+* **Neural Network Potential (NNP)**
 
     Clone the [n2p2](https://github.com/CompPhysVienna/n2p2) package from GitHub.
     ```
@@ -179,7 +179,7 @@ The usage of mlearn requires installation of specific packages and the plugins i
     An example is provided in `mlearn/notebooks/NNP_example/example.ipynb`.
     
 
-* Spectral Neighbor Analysis Potential (SNAP)
+* **Spectral Neighbor Analysis Potential (SNAP)**
 
     The calculations rely on [LAMMPS package](https://lammps.sandia.gov) itself. 
     Assume `LMP_ROOT` is the path of LAMMPS package. To install SNAP package, enable 

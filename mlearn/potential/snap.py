@@ -5,11 +5,15 @@
 from __future__ import division, print_function, unicode_literals, \
     absolute_import
 
+import re
 import numpy as np
+from monty.io import zopen
 from pymatgen import Element
 from mlearn.potential.abstract import Potential
+from mlearn.model.linear_model import LinearModel
 from mlearn.data.processing import pool_from, convert_docs
 from mlearn.potential.lammps.calcs import EnergyForceStress
+from mlearn.describer.atomic_describer import BispectrumCoefficients
 
 
 class SNAPotential(Potential):
@@ -155,3 +159,52 @@ class SNAPotential(Potential):
         """
         self.model.save(filename=filename)
         return filename
+
+    @staticmethod
+    def from_config(param_file, coeff_file, **kwargs):
+        """
+        Initialize potential with parameters file and coefficient file.
+
+        Args:
+            param_file (str): The file storing the configuration of potential.
+            coeff_file (str): The file storing the coefficients of potential.
+
+        Return:
+            SNAPotential.
+        """
+        with open(coeff_file) as f:
+            coeff_lines = f.readlines()
+        coeff_lines = [line for line in coeff_lines if not line.startswith('#')]
+        specie, r, w = coeff_lines[1].split()
+        r, w = float(r), int(w)
+        element_profile = {specie: {'r': r, 'w': w}}
+
+        rcut_pattern = re.compile('rcutfac (.*?)\n', re.S)
+        twojmax_pattern = re.compile('twojmax (\d*)\n', re.S)
+        rfac_pattern = re.compile('rfac0 (.*?)\n', re.S)
+        rmin_pattern = re.compile('rmin0 (.*?)\n', re.S)
+        diagonalstyle_pattern = re.compile('diagonalstyle (.*?)\n', re.S)
+        quadratic_pattern = re.compile('quadraticflag (.*?)(?=\n|$)', re.S)
+
+        with zopen(param_file, 'rt') as f:
+            param_lines = f.read()
+
+        rcut = float(rcut_pattern.findall(param_lines)[-1])
+        twojmax = int(twojmax_pattern.findall(param_lines)[-1])
+        rfac = float(rfac_pattern.findall(param_lines)[-1])
+        rmin = int(rmin_pattern.findall(param_lines)[-1])
+        diagonal = int(diagonalstyle_pattern.findall(param_lines)[-1])
+        if quadratic_pattern.findall(param_lines):
+            quadratic = bool(int(quadratic_pattern.findall(param_lines)[-1]))
+        else:
+            quadratic = False
+
+        describer = BispectrumCoefficients(rcutfac=rcut, twojmax=twojmax,
+                                           rfac0=rfac, element_profile=element_profile,
+                                           rmin0=rmin, diagonalstyle=diagonal, quadratic=quadratic)
+        model = LinearModel(describer=describer, **kwargs)
+        model.model.coef_ = np.array(coeff_lines[2:], dtype=np.float)
+        model.model.intercept_ = 0
+        snap =  SNAPotential(model=model)
+        snap.specie = Element(specie)
+        return snap

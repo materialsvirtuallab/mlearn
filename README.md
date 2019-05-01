@@ -180,3 +180,20 @@ The usage of mlearn requires installation of specific packages and the plugins i
     
 
 * Spectral Neighbor Analysis Potential (SNAP)
+
+    The calculations rely on [LAMMPS package](https://lammps.sandia.gov) itself. 
+    Assume `LMP_ROOT` is the path of LAMMPS package. To install SNAP package, enable 
+    the SNAP interface in `${LMP_ROOT}/src` directory.
+    ```
+    make yes-snap
+    ```
+    
+    The serial version of LAMMPS containing SNAP interface can then be installed.
+    (Please refer to [LAMMPS website](https://lammps.sandia.gov/) for the installation 
+    of other versions.)
+    ```
+    make serial
+    ``` 
+    Examples of SNAP and qSNAP are provided in 
+    `mlearn/notebooks/SNAP_example/example.ipynb` and 
+    `mlearn/notebooks/qSNAP_example/example.ipynb`.

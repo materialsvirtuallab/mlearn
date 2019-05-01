@@ -16,7 +16,7 @@ import numpy as np
 from monty.tempfile import ScratchDir
 from pymatgen import Element
 from pymatgen.io.lammps.data import LammpsData
-from mlearn.potential.abstract import Potential
+from mlearn.potentials.abstract import Potential
 
 _sort_elements = lambda symbols: [e.symbol for e in
                                   sorted([Element(e) for e in symbols])]
@@ -330,8 +330,8 @@ class ElasticConstant(LMPStaticCalculator):
             ff_settings (list/Potential): Configure the force field settings for LAMMPS
                 calculation, if given a Potential object, should apply
                 Potential.write_param method to get the force field setting.
-            potential_type (str): 'internal' indicates the internal potential
-                installed in lammps, 'external' indicates the external potential
+            potential_type (str): 'internal' indicates the internal potentials
+                installed in lammps, 'external' indicates the external potentials
                 outside of lammps.
             deformation_size (float): Finite deformation size. Usually range from
                 1e-2 to 1e-8, to confirm the results not depend on it.
@@ -360,7 +360,7 @@ class ElasticConstant(LMPStaticCalculator):
             input_template = f.read()
         with open(os.path.join(template_dir, 'init.template'), 'r') as f:
             init_template = f.read()
-        with open(os.path.join(template_dir, 'potential.template'), 'r') as f:
+        with open(os.path.join(template_dir, 'potentials.template'), 'r') as f:
             potential_template = f.read()
         with open(os.path.join(template_dir, 'displace.template'), 'r') as f:
             displace_template = f.read()
@@ -380,7 +380,7 @@ class ElasticConstant(LMPStaticCalculator):
                                          jiggle=self.jiggle, maxiter=self.maxiter,
                                          maxeval=self.maxeval, lattice=self.lattice,
                                          alat=self.alat))
-        with open('potential.mod', 'w') as f:
+        with open('potentials.mod', 'w') as f:
             f.write(potential_template.format(ff_settings='\n'.join(ff_settings)))
         with open('displace.mod', 'w') as f:
             f.write(displace_template.format(read_restart=self.read_command,

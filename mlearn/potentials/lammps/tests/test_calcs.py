@@ -14,10 +14,10 @@ import json
 import numpy as np
 from monty.os.path import which
 from pymatgen import Structure, Lattice, Element
-from mlearn.potential.snap import SNAPotential
-from mlearn.model.linear_model import LinearModel
+from mlearn.potentials.snap import SNAPotential
+from mlearn.models.linear_model import LinearModel
 from mlearn.describer.atomic_describer import BispectrumCoefficients
-from mlearn.potential.lammps.calcs import \
+from mlearn.potentials.lammps.calcs import \
     SpectralNeighborAnalysis, EnergyForceStress, ElasticConstant, LatticeConstant
 
 CWD = os.getcwd()

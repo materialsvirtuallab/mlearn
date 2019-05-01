@@ -2,18 +2,16 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
 
 import re
 import numpy as np
 from monty.io import zopen
 from pymatgen import Element
-from mlearn.potential.abstract import Potential
-from mlearn.model.linear_model import LinearModel
-from mlearn.data.processing import pool_from, convert_docs
-from mlearn.potential.lammps.calcs import EnergyForceStress
-from mlearn.describer.atomic_describer import BispectrumCoefficients
+from mlearn.potentials import Potential
+from mlearn.models import LinearModel
+from mlearn.data import pool_from, convert_docs
+from mlearn.potentials.lammps.calcs import EnergyForceStress
+from mlearn.describers import BispectrumCoefficients
 
 
 class SNAPotential(Potential):
@@ -63,7 +61,7 @@ class SNAPotential(Potential):
     def evaluate(self, test_structures, ref_energies, ref_forces, ref_stresses):
         """
         Evaluate energies, forces and stresses of structures with trained
-        interatomic potential.
+        interatomic potentials.
 
         Args:
             test_structures ([Structure]): List of Pymatgen Structure Objects.
@@ -149,10 +147,10 @@ class SNAPotential(Potential):
 
     def save(self, filename):
         """
-        Save parameters of the potential.
+        Save parameters of the potentials.
 
         Args:
-            filename (str): The file to store parameters of potential.
+            filename (str): The file to store parameters of potentials.
 
         Returns:
             (str)
@@ -163,11 +161,11 @@ class SNAPotential(Potential):
     @staticmethod
     def from_config(param_file, coeff_file, **kwargs):
         """
-        Initialize potential with parameters file and coefficient file.
+        Initialize potentials with parameters file and coefficient file.
 
         Args:
-            param_file (str): The file storing the configuration of potential.
-            coeff_file (str): The file storing the coefficients of potential.
+            param_file (str): The file storing the configuration of potentials.
+            coeff_file (str): The file storing the coefficients of potentials.
 
         Return:
             SNAPotential.

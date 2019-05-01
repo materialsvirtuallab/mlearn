@@ -2,18 +2,14 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
-
-import io
 import itertools
-import subprocess
 
 import numpy as np
 import pandas as pd
 from monty.json import MSONable
 from pymatgen.core.periodic_table import get_el_sp
 from sklearn.base import TransformerMixin, BaseEstimator
+
 
 class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
     """
@@ -42,12 +38,12 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
                 default to 3.
             quadratic (bool): Whether including quadratic terms.
                 Default to False.
-            pot_fit (bool): Whether to output in potential fitting
+            pot_fit (bool): Whether to output in potentials fitting
                 format. Default to False, i.e., returning the bispectrum
                 coefficients for each site.
 
         """
-        from mlearn.potential.lammps.calcs import SpectralNeighborAnalysis
+        from mlearn.potentials.lammps.calcs import SpectralNeighborAnalysis
         self.calculator = SpectralNeighborAnalysis(rcutfac, twojmax,
                                                    element_profile,
                                                    rfac0, rmin0,
@@ -89,7 +85,7 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
             bispectrum components, while indices are the site indices
             in input structure.
 
-            In potential fitting format, to match the sequence of
+            In potentials fitting format, to match the sequence of
             [energy, f_x[0], f_y[0], ..., f_z[N], v_xx, ..., v_xy], the
             bispectrum coefficients are summed up by each specie and
             normalized by a factor of No. of atoms (in the 1st row),
@@ -121,8 +117,8 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
                            self.subscripts))
         if self.quadratic:
             columns += list(map(lambda s: '-'.join(['%d%d%d' % (i, j, k)
-                                                   for i, j, k in s ]),
-            itertools.combinations_with_replacement(self.subscripts, 2)))
+                                                    for i, j, k in s]),
+                                itertools.combinations_with_replacement(self.subscripts, 2)))
 
         raw_data = self.calculator.calculate(structures)
 

@@ -2,9 +2,6 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
-
 import os
 import shutil
 import tempfile
@@ -12,7 +9,7 @@ import tempfile
 import unittest
 import numpy as np
 from monty.serialization import loadfn
-from mlearn.data.processing import pool_from, convert_docs
+from mlearn.data import pool_from, convert_docs
 
 CWD = os.getcwd()
 test_datapool = loadfn(os.path.join(os.path.dirname(__file__), 'datapool.json'))

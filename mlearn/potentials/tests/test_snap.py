@@ -12,9 +12,9 @@ import tempfile
 
 from monty.os.path import which
 from monty.serialization import loadfn
-from mlearn.potential.snap import SNAPotential
-from mlearn.model.linear_model import LinearModel
-from mlearn.describer.atomic_describer import BispectrumCoefficients
+from mlearn.potentials.snap import SNAPotential
+from mlearn.models import LinearModel
+from mlearn.describers import BispectrumCoefficients
 
 CWD = os.getcwd()
 test_datapool = loadfn(os.path.join(os.path.dirname(__file__), 'datapool.json'))

@@ -14,7 +14,7 @@ class Potential(six.with_metaclass(abc.ABCMeta, MSONable)):
     @abc.abstractmethod
     def train(self, train_structures, energies, forces, stresses, **kwargs):
         """
-        Train interatomic potential with energies, forces and
+        Train interatomic potentials with energies, forces and
         stresses corresponding to structures.
 
         Args:
@@ -33,7 +33,7 @@ class Potential(six.with_metaclass(abc.ABCMeta, MSONable)):
     def evaluate(self, test_structures, ref_energies, ref_forces, ref_stresses):
         """
         Evaluate energies, forces and stresses of structures with trained
-        interatomic potential.
+        interatomic potentials.
 
         Args:
             test_structures (list): List of Pymatgen Structure Objects.

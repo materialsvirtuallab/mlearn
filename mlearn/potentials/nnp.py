@@ -2,9 +2,6 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
-
 import re
 import os
 import glob
@@ -20,9 +17,9 @@ from monty.tempfile import ScratchDir
 from monty.serialization import loadfn
 from pymatgen import Structure, Lattice, Element, units
 
-from mlearn.potential.abstract import Potential
-from mlearn.data.processing import pool_from, convert_docs
-from mlearn.potential.lammps.calcs import EnergyForceStress
+from mlearn.potentials import Potential
+from mlearn.data import pool_from, convert_docs
+from mlearn.potentials.lammps.calcs import EnergyForceStress
 
 module_dir = os.path.dirname(__file__)
 NNinput_params = loadfn(os.path.join(module_dir, 'params', 'NNinput.json'))
@@ -643,7 +640,7 @@ class NNPotential(Potential):
     def evaluate(self, test_structures, ref_energies, ref_forces, ref_stresses):
         """
         Evaluate energies, forces and stresses of structures with trained
-        interatomic potential.
+        interatomic potentials.
 
         Args:
             test_structures ([Structure]): List of Pymatgen Structure Objects.
@@ -711,7 +708,7 @@ class NNPotential(Potential):
     @staticmethod
     def from_config(input_filename, scaling_filename, weights_filename):
         """
-        Initialize potential with parameters file.
+        Initialize potentials with parameters file.
 
         Args:
             input_filename (str): The file storing the input configuration of

@@ -2,9 +2,6 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
-
 import re
 import os
 import yaml
@@ -19,16 +16,16 @@ from monty.tempfile import ScratchDir
 from monty.serialization import loadfn
 from pymatgen import Structure, Lattice, Element
 
-from mlearn.potential.abstract import Potential
-from mlearn.data.processing import pool_from, convert_docs
-from mlearn.potential.lammps.calcs import EnergyForceStress
+from mlearn.potentials import Potential
+from mlearn.data import pool_from, convert_docs
+from mlearn.potentials.lammps.calcs import EnergyForceStress
 
 module_dir = os.path.dirname(__file__)
 soap_params = loadfn(os.path.join(module_dir, 'params', 'GAP.json'))
 
 class GAPotential(Potential):
     """
-    This class implements Smooth Overlap of Atomic Position potential.
+    This class implements Smooth Overlap of Atomic Position potentials.
     """
     pair_style = 'pair_style        quip'
     pair_coeff = 'pair_coeff        * * {} {} {}'
@@ -37,7 +34,7 @@ class GAPotential(Potential):
 
         Args:
             name (str): Name of force field.
-            param (dict): The parameter configuration of potential.
+            param (dict): The parameter configuration of potentials.
         """
         self.name = name if name else "GAPotential"
         self.param = param if param else {}
@@ -340,7 +337,7 @@ class GAPotential(Potential):
                         predict_forces=True, predict_stress=False):
         """
         Evaluate energies, forces and stresses of structures with trained
-        interatomic potential.
+        interatomic potentials.
 
         Args:
             test_structures ([Structure]): List of Pymatgen Structure Objects.
@@ -405,10 +402,10 @@ class GAPotential(Potential):
 
     def save(self, filename='param.yaml'):
         """
-        Save parameters of the potential.
+        Save parameters of the potentials.
 
         Args:
-            filename (str): The file to store parameters of potential.
+            filename (str): The file to store parameters of potentials.
 
         Returns:
             (str)
@@ -421,10 +418,10 @@ class GAPotential(Potential):
     @staticmethod
     def from_config(filename):
         """
-        Initialize potential with parameters file.
+        Initialize potentials with parameters file.
 
         ARgs:
-            filename (str): The file storing parameters of potential.
+            filename (str): The file storing parameters of potentials.
 
         Returns:
             GAPotential.

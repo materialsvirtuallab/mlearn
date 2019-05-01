@@ -2,8 +2,6 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
 
 import os
 import re
@@ -21,9 +19,9 @@ from monty.serialization import loadfn
 from monty.tempfile import ScratchDir
 from pymatgen import Structure, Lattice, Element
 
-from mlearn.potential.abstract import Potential
-from mlearn.data.processing import pool_from, convert_docs
-from mlearn.potential.lammps.calcs import EnergyForceStress
+from mlearn.potentials import Potential
+from mlearn.data import pool_from, convert_docs
+from mlearn.potentials.lammps.calcs import EnergyForceStress
 
 module_dir = os.path.dirname(__file__)
 MTini_params = loadfn(os.path.join(module_dir, 'params', 'MTini.json'))
@@ -46,7 +44,7 @@ def feed(attribute, kwargs, dictionary, tab='\t'):
 
 class MTPotential(Potential):
     """
-    This class implements moment tensor potential.
+    This class implements moment tensor potentials.
     """
     pair_style = 'pair_style        mlip {}'
     pair_coeff = 'pair_coeff        * *'
@@ -56,7 +54,7 @@ class MTPotential(Potential):
 
         Args:
             name (str): Name of force field.
-            param (dict): The parameter configuration of potential.
+            param (dict): The parameter configuration of potentials.
         """
         self.name = name if name else "MTPotential"
         self.mtp_stress_order = ['xx', 'yy', 'zz', 'yz', 'xz', 'xy']
@@ -146,7 +144,7 @@ class MTPotential(Potential):
 
                 0: If Ab-initio model is not required.
                 1: Used if driver provides EFS data with configurations.
-                2: Use embedded Liennard-Jones pair potential.
+                2: Use embedded Liennard-Jones pair potentials.
 
                     r_min (float): Distance to minimum of pair function (in Angstroms).
                         Default to 2.0
@@ -166,7 +164,7 @@ class MTPotential(Potential):
                     Output_file (str): ile with configuration and EFS data to be read by MLIP.
                     Start_command (str): Relative path of command file.
 
-                5: Use MTP as Ab-initio potential.
+                5: Use MTP as Ab-initio potentials.
 
                     MTP_filename (str): MTP file name.
 
@@ -435,7 +433,7 @@ class MTPotential(Potential):
             atoms_filename = self.write_cfg(filename=atoms_filename, cfg_pool=train_pool)
 
             if not unfitted_mtp:
-                raise RuntimeError("No specific potential file provided.")
+                raise RuntimeError("No specific potentials file provided.")
             MTP_file_path = os.path.join(module_dir, 'params', unfitted_mtp)
             shutil.copyfile(MTP_file_path, os.path.join(os.getcwd(), unfitted_mtp))
 
@@ -508,7 +506,7 @@ class MTPotential(Potential):
                     ref_forces=None, ref_stresses=None, **kwargs):
         """
         Evaluate energies, forces and stresses of structures with trained
-        interatomic potential.
+        interatomic potentials.
 
         Args:
             test_structures ([Structure]): List of Pymatgen Structure Objects.
@@ -578,10 +576,10 @@ class MTPotential(Potential):
 
     def save(self, filename='param.yaml'):
         """
-        Save parameters of the potential.
+        Save parameters of the potentials.
 
         Args:
-            filename (str): The file to store parameters of potential.
+            filename (str): The file to store parameters of potentials.
 
         Returns:
             (str)
@@ -594,10 +592,10 @@ class MTPotential(Potential):
     @staticmethod
     def from_config(filename):
         """
-        Initialize potential with parameters file.
+        Initialize potentials with parameters file.
 
         ARgs:
-            filename: The file storing parameters of potential.
+            filename: The file storing parameters of potentials.
 
         Returns:
             MTPotential

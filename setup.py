@@ -9,7 +9,7 @@ with open(join(this_dir, 'README.md'), encoding='utf-8') as f:
 setup(
     name='mlearn',
     version='0.1.0',
-    decription='https://github.com/materialsvirtuallab/mlearn.git',
+    description='https://github.com/materialsvirtuallab/mlearn.git',
     long_description=long_description,
     long_description_content_type='text/markdown',
     download_url='https://github.com/materialsvirtuallab/mlearn',

@@ -34,7 +34,7 @@ The usage of mlearn requires installation of specific packages and the plugins i
     Make sure `QUIP_ROOT` and `QUIP_ARCH` are in environment path for further 
     auto-detection of building LAMMPS.
      
-    Define the environment variable `QUIP_INSTALLDIR` and add it into the environment path. 
+    Define the environment variable `QUIP_INSTALLDIR` and add it to the environment path. 
     When the compilation and installation finishes, all compiled programs will be copied 
     to `QUIP_INSTALLDIR`.
     ```
@@ -101,7 +101,7 @@ The usage of mlearn requires installation of specific packages and the plugins i
     ./configure
     ```
     
-    Compile and build the MLIP executable and add the `${MLIP_ROOT}/bin` in environment path.
+    Compile and build the MLIP executable and add the `${MLIP_ROOT}/bin` to environment path.
     ```
     make mlp
     ```
@@ -126,5 +126,57 @@ The usage of mlearn requires installation of specific packages and the plugins i
 
 * Neural Network Potential (NNP)
 
+    Clone the [n2p2](https://github.com/CompPhysVienna/n2p2) package from GitHub.
+    ```
+    git clone https://github.com/CompPhysVienna/n2p2.git
+    ```
+    
+    Assume `N2P2_ROOT` is the path of the n2p2 package. Build the neccessary executables in
+    `${N2P2_ROOT}/src` directory. (Make sure 
+    [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) and 
+    [GSL](https://www.gnu.org/software/gsl) are installed and visible in the system).
+    ```
+    make
+    ```
+    
+    Add the path of `${N2P2_ROOT}/bin` to the environment path.
+    
+    Build the shared libraries of neural network potentials in `${N2P2_ROOT}/src` directory.
+    ```
+    make libnnpif-shared
+    ``` 
+    
+    Add the path of NNP libraries `${N2P2_ROOT}/lib` to library path `LD_LIBRARY_PATH`.
+    
+    Clone the LAMMPS repository from GitHub. (if LAMMPS package has already been installed, 
+    skip this step).
+    ```
+    git clone git@github.com:lammps/lammps.git
+    ```
+    
+    Assume `LMP_ROOT` is the path of LAMMPS package. Link to NNP libraries in `${LMP_ROOT}` 
+    directory.
+    ```
+    ln -s ${N2P2_ROOT} lib/nnp
+    ```
+    
+    Copy the USER-NNP package to the LAMMPS source directory.
+    ```
+    cp -r ${N2P2_ROOT}/src/interface/LAMMPS/src/USER-NNP ${LMP_ROOT}/src
+    ```
+    
+    Enable LAMMPS interface with NNP in `${LMP_PATH}/src` directory.
+    ```
+    make yes-user-nnp
+    ```
+    
+    The serial version of LAMMPS containing NNP interface can then be installed. 
+    (Please refer to [LAMMPS website](https://lammps.sandia.gov/) for the installation 
+    of other versions.)
+    ```
+    make serial
+    ```
+    An example is provided in `mlearn/notebooks/NNP_example/example.ipynb`.
+    
 
 * Spectral Neighbor Analysis Potential (SNAP)

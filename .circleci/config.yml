@@ -1,0 +1,38 @@
+version: 2
+jobs:
+  py3test:
+    working_directory: ~/mlearn
+    docker:
+      - image: materialsvirtuallab/circle-ci-pmg-py3:0.0.2
+    steps:
+      - checkout
+      - run:
+          command: |
+            export PATH=$HOME/miniconda3/bin:$PATH
+            if [ ! -d "/root/miniconda3/envs/test_env" ]; then conda create --quiet --yes --name test_env python=3.6; fi
+            source activate test_env
+            conda install --quiet --yes numpy scipy matplotlib sympy cython
+            conda upgrade --quiet --all
+            pip install numpy --upgrade
+            pip install --quiet --ignore-installed -r requirements.txt -r requirements-ci.txt
+      - run:
+          command: |
+            export PATH=$HOME/miniconda3/bin:$PATH
+            export MPLBACKEND=Agg
+            source activate test_env
+            pip install --quiet -e .
+            mkdir coverage_reports
+            nosetests --config=nose.cfg --process-timeout=600 --cover-html --cover-html-dir=$CIRCLE_ARTIFACTS mlearn
+            coveralls
+          no_output_timeout: 3600
+      - store_artifacts:
+          path: coverage_reports/
+          destination: tr1
+      - store_test_results:
+          path: coverage_reports/
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - py3test

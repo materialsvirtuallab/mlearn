@@ -541,9 +541,9 @@ class MTPotential(Potential):
             original_file = self.write_cfg(original_file, cfg_pool=predict_pool)
             _, df_orig = self.read_cfgs(original_file, symbol=symbol)
 
-            p = subprocess.Popen(['/home/y9zuo/repos_dev/mlip-dev/bin/mlp',
-                                  'run', 'mlip.ini',
-                                  '--filename={}'.format(original_file)], stdout=subprocess.PIPE)
+            p = subprocess.Popen(['mlp', 'run', 'mlip.ini',
+                                  '--filename={}'.format(original_file)],
+                                  stdout=subprocess.PIPE)
             stdout = p.communicate()[0]
             rc = p.returncode
             if rc != 0:

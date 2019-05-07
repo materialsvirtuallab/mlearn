@@ -104,5 +104,14 @@ class NNPitentialTest(unittest.TestCase):
         self.assertEqual(len(forces), len(self.test_struct))
         self.assertEqual(len(stress), 6)
 
+    def test_from_config(self):
+        nnp = NNPotential.from_config(os.path.join(os.path.dirname(__file__),
+                                                   'NNP', 'input.nn'),
+                                      os.path.join(os.path.dirname(__file__),
+                                                   'NNP', 'scaling.data'),
+                                      os.path.join(os.path.dirname(__file__),
+                                                   'NNP', 'weights.data'))
+        self.assertTrue(nnp.fitted)
+
 if __name__ == '__main__':
     unittest.main()

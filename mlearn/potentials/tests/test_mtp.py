@@ -92,5 +92,10 @@ class MTPotentialTest(unittest.TestCase):
         self.assertEqual(len(forces), len(self.test_struct))
         self.assertEqual(len(stress), 6)
 
+    def test_from_config(self):
+        mtp = MTPotential.from_config(os.path.join(os.path.dirname(__file__),
+                                                   'MTP', 'fitted.mtp'))
+        self.assertIsNotNone(mtp.param)
+
 if __name__ == '__main__':
     unittest.main()

@@ -14,11 +14,12 @@ import json
 import numpy as np
 from monty.os.path import which
 from pymatgen import Structure, Lattice, Element
+from mlearn.models import LinearModel
 from mlearn.potentials.snap import SNAPotential
-from mlearn.models.linear_model import LinearModel
-from mlearn.describer.atomic_describer import BispectrumCoefficients
+from mlearn.describers import BispectrumCoefficients
 from mlearn.potentials.lammps.calcs import \
-    SpectralNeighborAnalysis, EnergyForceStress, ElasticConstant, LatticeConstant
+    SpectralNeighborAnalysis, EnergyForceStress, ElasticConstant, LatticeConstant, \
+    NudgedElasticBand
 
 CWD = os.getcwd()
 with open(os.path.join(os.path.dirname(__file__), 'coeff.json')) as f:
@@ -280,6 +281,46 @@ class LatticeConstantTest(unittest.TestCase):
         np.testing.assert_almost_equal(calc_a, a, decimal=2)
         np.testing.assert_almost_equal(calc_b, b, decimal=2)
         np.testing.assert_almost_equal(calc_c, c, decimal=2)
+
+class NudgedElasticBandTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.this_dir = os.path.dirname(os.path.abspath(__file__))
+        cls.test_dir = tempfile.mkdtemp()
+        os.chdir(cls.test_dir)
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(CWD)
+        shutil.rmtree(cls.test_dir)
+
+    def setUp(self):
+
+        element_profile = {'Ni': {'r': 0.5, 'w': 1}}
+        describer = BispectrumCoefficients(rcutfac=4.1, twojmax=8,
+                                           element_profile=element_profile,
+                                           pot_fit=True)
+        model = LinearModel(describer=describer)
+        model.model.coef_ = coeff
+        model.model.intercept_ = intercept
+        snap = SNAPotential(model=model)
+        snap.specie = Element('Ni')
+        self.struct = Structure.from_spacegroup('Fm-3m',
+                                                Lattice.cubic(3.506),
+                                                ['Ni'], [[0, 0, 0]])
+        self.ff_settings = snap
+
+    @unittest.skipIf(not which('lmp_serial'), 'No LAMMPS serial cmd found.')
+    @unittest.skipIf(not which('lmp_mpi'), 'No LAMMPS mpi cmd found.')
+    def test_calculate(self):
+        calculator = NudgedElasticBand(ff_settings=self.ff_settings, specie='Ni',
+                                       lattice='fcc', alat=3.506)
+        migration_barrier = calculator.calculate()
+        np.testing.assert_almost_equal(migration_barrier, 1.1446, decimal=2)
+        invalid_calculator = NudgedElasticBand(ff_settings=self.ff_settings, specie='Ni',
+                                               lattice='fccc', alat=3.506)
+        self.assertRaises(ValueError, invalid_calculator.calculate)
 
 
 if __name__ == '__main__':

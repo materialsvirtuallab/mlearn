@@ -111,6 +111,12 @@ class SNAPotentialTest(unittest.TestCase):
         self.assertEqual(len(forces), len(self.test_struct))
         self.assertEqual(len(stress), 6)
 
+    def test_from_config(self):
+        snap = SNAPotential.from_config(os.path.join(os.path.dirname(__file__),
+                                        'SNAP', 'SNAPotential.snapparam'),
+                                        os.path.join(os.path.dirname(__file__),
+                                        'SNAP', 'SNAPotential.snapcoeff'))
+        self.assertTrue(getattr(snap.model.model, 'coef_') is not None)
 
 if __name__ == '__main__':
     unittest.main()

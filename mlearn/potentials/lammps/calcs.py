@@ -662,5 +662,7 @@ class NudgedElasticBand(LMPStaticCalculator):
         Parse results from dump files.
 
         """
-        migration_barrier = _read_dump('log.lammps')[-1][6]
+        with open('log.lammps') as f:
+            lines = f.readlines()[-1:]
+        migration_barrier = float(lines[0].split()[6])
         return migration_barrier

@@ -14,9 +14,10 @@ import itertools
 import six
 import numpy as np
 from monty.tempfile import ScratchDir
-from pymatgen import Element
+from mlearn.potentials import Potential
 from pymatgen.io.lammps.data import LammpsData
-from mlearn.potentials.abstract import Potential
+from pymatgen import Structure, Lattice, Element
+
 
 _sort_elements = lambda symbols: [e.symbol for e in
                                   sorted([Element(e) for e in symbols])]
@@ -468,3 +469,198 @@ class LatticeConstant(LMPStaticCalculator):
         """
         a, b, c = np.loadtxt('lattice.txt')
         return a, b, c
+
+class NudgedElasticBand(LMPStaticCalculator):
+    """
+    NudgedElasticBand migration energy calculator.
+    """
+    def __init__(self, ff_settings, specie, lattice, alat, num_replicas=8):
+        """
+        Args:
+            ff_settings (list/Potential): Configure the force field settings for LAMMPS
+                calculation, if given a Potential object, should apply
+                Potential.write_param method to get the force field setting.
+            specie (str): Name of specie.
+            lattice (str): The lattice type of structure. e.g. bcc or diamond.
+            alat (float): The lattice constant of specific lattice and specie.
+            num_replicas (int): Number of replicas to use.
+        """
+        self.ff_settings = ff_settings
+        self.specie = specie
+        self.lattice = lattice
+        self.alat = alat
+        self.num_replicas = num_replicas
+
+    def get_unit_cell(self, specie, lattice, alat):
+        """
+        Get the unit cell from specie, lattice type and lattice constant.
+
+        Args
+            specie (str): Name of specie.
+            lattice (str): The lattice type of structure. e.g. bcc or diamond.
+            alat (float): The lattice constant of specific lattice and specie.
+        """
+        if lattice == 'fcc':
+            unit_cell = Structure.from_spacegroup(sg='Fm-3m',
+                                                  lattice=Lattice.cubic(alat),
+                                                  species=[specie], coords=[[0, 0, 0]])
+        elif lattice == 'bcc':
+            unit_cell = Structure.from_spacegroup(sg='Im-3m',
+                                                  lattice=Lattice.cubic(alat),
+                                                  species=[specie], coords=[[0, 0, 0]])
+        elif lattice == 'diamond':
+            unit_cell = Structure.from_spacegroup(sg='Fd-3m',
+                                                  lattice=Lattice.cubic(alat),
+                                                  species=[specie], coords=[[0, 0, 0]])
+        else:
+            raise ValueError("Lattice type is invalid.")
+
+        return unit_cell
+
+    def _setup(self):
+        template_dir = os.path.join(os.path.dirname(__file__), 'templates', 'neb')
+
+        with open(os.path.join(template_dir, 'in.relax.template'), 'r') as f:
+            relax_template = f.read()
+        with open(os.path.join(template_dir, 'in.neb.template'), 'r') as f:
+            neb_template = f.read()
+
+        unit_cell = self.get_unit_cell(specie=self.specie, lattice=self.lattice,
+                                       alat=self.alat)
+        lattice_calculator = LatticeConstant(ff_settings=self.ff_settings)
+        a, _, _ = lattice_calculator.calculate([unit_cell])[0]
+        unit_cell = self.get_unit_cell(specie=self.specie, lattice=self.lattice,
+                                       alat=a)
+
+        super_cell = unit_cell * [4, 4, 4]
+        ld = LammpsData.from_structure(super_cell, atom_style='atomic')
+        ld.write_file('initial.vac')
+
+        if self.lattice == 'fcc':
+            del_id = 43
+            vacneigh_ids = [170, 171]
+        elif self.lattice == 'bcc':
+            del_id = 43
+            vacneigh_ids = [90, 91]
+        elif self.lattice == 'diamond':
+            del_id = 407
+            vacneigh_ids = [342, 214, 87, 471, 167, 283, 43]
+        else:
+            raise ValueError("Lattice type is invalid.")
+
+        basis = '\n'.join(['                basis {} {} {}  &'.format(*site.frac_coords)
+                           for site in unit_cell])
+        with open('in.relax', 'w') as f:
+            f.write(relax_template.format(alat=a, basis=basis, specie=self.specie,
+                                          ff_settings='\n'.join(self.ff_settings.write_param()),
+                                          del_id=del_id, vacneigh_ids=' '.join([str(idx)
+                                          for idx in vacneigh_ids])))
+
+        p = subprocess.Popen([self.LMP_EXE, '-in', 'in.relax'], stdout=subprocess.PIPE)
+        stdout = p.communicate()[0]
+
+        rc = p.returncode
+        if rc != 0:
+            error_msg = 'LAMMPS exited with return code %d' % rc
+            msg = stdout.decode("utf-8").split('\n')[:-1]
+            try:
+                error_line = [i for i, m in enumerate(msg)
+                              if m.startswith('ERROR')][0]
+                error_msg += ', '.join([e for e in msg[error_line:]])
+            except:
+                error_msg += msg[-1]
+            raise RuntimeError(error_msg)
+
+        ld_relaxed = LammpsData.from_file('data.relaxed', atom_style='atomic')
+
+        if self.lattice == 'fcc':
+            lines = ['2']
+            lines.append('{}  {} {} {}'.format(str(170), *super_cell[169].coords))
+            lines.append('{}  {} {} {}'.format(str(171), *super_cell[42].coords))
+            with open('final.vac', 'w') as f:
+                f.write('\n'.join(lines))
+
+        elif self.lattice == 'bcc':
+            lines = ['2']
+            lines.append('{}  {} {} {}'.format(str(90), *super_cell[89].coords))
+            lines.append('{}  {} {} {}'.format(str(91), *super_cell[42].coords))
+            with open('final.vac', 'w') as f:
+                f.write('\n'.join(lines))
+
+        elif self.lattice == 'diamond':
+            lines = ['7']
+            lines.append('{}  {} {} {}'.format(str(342), *super_cell[341].coords))
+            lines.append('{}  {} {} {}'.format(str(214), *super_cell[213].coords))
+            lines.append('{}  {} {} {}'.format(str(87), *super_cell[86].coords))
+            frac_coords = np.concatenate(
+                (ld_relaxed.structure[86].frac_coords[:2] + [0.0625, 0.0625],
+                 super_cell[406].frac_coords[2] + [0.015]))
+            lines.append('{}  {} {} {}'.format(str(471),
+                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
+            frac_coords = np.concatenate(
+                (ld_relaxed.structure[213].frac_coords[:2] + [0.0625, 0.0625],
+                 ld_relaxed.structure[166].frac_coords[2] - [0.01]))
+            lines.append('{}  {} {} {}'.format(str(167),
+                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
+            frac_coords = np.concatenate(
+                (ld_relaxed.structure[341].frac_coords[:2] + [0.0625, 0.0625],
+                 ld_relaxed.structure[282].frac_coords[2] - [0.01]))
+            lines.append('{}  {} {} {}'.format(str(283),
+                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
+            frac_coords = np.concatenate(
+                (ld_relaxed.structure[470].frac_coords[:2] + [0.0625, 0.0625],
+                 ld_relaxed.structure[42].frac_coords[2] + [0.015]))
+            lines.append('{}  {} {} {}'.format(str(43),
+                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
+
+        else:
+            raise ValueError("Lattice type is invalid.")
+
+        with open('final.vac', 'w') as f:
+            f.write('\n'.join(lines))
+
+        input_file = 'in.neb'
+
+        with open(input_file, 'w') as f:
+            f.write(neb_template.format(alat=a, basis=basis, specie=self.specie,
+                    ff_settings='\n'.join(self.ff_settings.write_param()),
+                    del_id=del_id, vacneigh_ids=' '.join([str(idx) for idx in vacneigh_ids])))
+
+        return input_file
+
+    def calculate(self):
+        with ScratchDir('.'):
+            input_file = self._setup()
+            p = subprocess.Popen(['mpirun', '-n', str(self.num_replicas),
+                                  'lmp_mpi', '-partition', '{}x1'.format(self.num_replicas),
+                                  '-in', input_file],
+                                  stdout=subprocess.PIPE)
+            stdout = p.communicate()[0]
+            rc = p.returncode
+            if rc != 0:
+                error_msg = 'LAMMPS exited with return code %d' % rc
+                msg = stdout.decode("utf-8").split('\n')[:-1]
+                try:
+                    error_line = [i for i, m in enumerate(msg)
+                                  if m.startswith('ERROR')][0]
+                    error_msg += ', '.join([e for e in msg[error_line:]])
+                except:
+                    error_msg += msg[-1]
+                raise RuntimeError(error_msg)
+            result = self._parse()
+        return result
+
+    def _sanity_check(self, structure):
+        """
+        Check if the structure is valid for this calculation.
+
+        """
+        return True
+
+    def _parse(self):
+        """
+        Parse results from dump files.
+
+        """
+        migration_barrier = _read_dump('log.lammps')[-1][6]
+        return migration_barrier

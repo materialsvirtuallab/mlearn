@@ -16,7 +16,7 @@ setup(
     license='BSD',
     install_requires=['numpy', "scikit-learn", 'pymatgen', 'monty', 
                       'pandas'],
-    package=find_packages(),
+    packages=find_packages(),
     package_data={
         "mlearn": ["*.json", "*.md"]
     },

@@ -57,9 +57,6 @@ class MTPotentialTest(unittest.TestCase):
             forces1 = np.array(data1['outputs']['forces'])
             forces2 = data2['outputs']['forces']
             np.testing.assert_array_almost_equal(forces1, forces2)
-            stress1 = np.array(data1['outputs']['virial_stress'])
-            stress2 = data2['outputs']['virial_stress']
-            np.testing.assert_array_almost_equal(stress1, stress2)
 
     @unittest.skipIf(not which('mlp'), 'No MLIP cmd found.')
     def test_train(self):

@@ -29,7 +29,7 @@ class LinearModel(BaseEstimator, MSONable):
         self.describer = describer
         self.regressor = regressor
         self.kwargs = kwargs
-        lm = sys.modules["sklearn.linear_model"]
+        import sklearn.linear_model as lm
         lr = getattr(lm, regressor)
         self.model = lr(**kwargs)
         self._xtrain = None

@@ -97,10 +97,6 @@ class GAPotentialTest(unittest.TestCase):
         self.assertEqual(len(forces), len(self.test_struct))
         self.assertEqual(len(stress), 6)
 
-    def test_from_config(self):
-        gap = GAPotential.from_config(os.path.join(os.path.dirname(__file__),
-                                                   'GAP', 'soap.xml'))
-        self.assertIsNot(gap.param, {})
 
 
 if __name__ == '__main__':

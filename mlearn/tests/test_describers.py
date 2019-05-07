@@ -13,7 +13,7 @@ import numpy as np
 from monty.os.path import which
 from pymatgen import Lattice, Structure, Element
 
-from mlearn.describer.atomic_describer import BispectrumCoefficients
+from mlearn.describers import BispectrumCoefficients
 
 class BispectrumCoefficientsTest(unittest.TestCase):
 

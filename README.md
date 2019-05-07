@@ -21,7 +21,20 @@ in [LAMMPS](https://lammps.sandia.gov/). Please see
 
 # References
 
-* Gaussian Approximation Potential: Bartók, A. P.; Payne, M. C.; Kondor, R.; Csányi, G. Gaussian Approximation Potentials: The Accuracy of Quantum Mechanics, without the Electrons. Physical Review Letters 2010, 104, 136403, [doi:10.1103/PhysRevLett.104.136403](https://doi.org/10.1103/PhysRevLett.104.136403).
-* [Moment Tensor Potential](https://epubs.siam.org/doi/abs/10.1137/15M1054183)
-* [Neural Network Potential](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.146401)
-* [Spectral Neighbor Analysis Potential](https://www.sciencedirect.com/science/article/pii/S0021999114008353)
+* **Gaussian Approximation Potential**: Bartók, A. P.; Payne, M. C.; Kondor, R.; Csányi, G. 
+    Gaussian Approximation Potentials: The Accuracy of Quantum Mechanics, without the Electrons. 
+    Physical Review Letters 2010, 104, 136403. 
+    [doi:10.1103/PhysRevLett.104.136403](https://doi.org/10.1103/PhysRevLett.104.136403).
+* **Moment Tensor Potential**: Shapeev, A. V. 
+    Moment tensor potentials: A class of systematically improvable interatomic potentials. 
+    Multiscale Modeling & Simulation, 14(3), 1153-1173.
+    [doi:10.1137/15M1054183](https://epubs.siam.org/doi/abs/10.1137/15M1054183)
+* **Neural Network Potential**: Behler, J., & Parrinello, M. 
+    Generalized neural-network representation of high-dimensional potential-energy surfaces. 
+    Physical Review Letters 2007, 98, 146401.
+    [doi:10.1103/PhysRevLett.98.146401](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.146401)
+* **Spectral Neighbor Analysis Potential**: Thompson, A. P., Swiler, L. P., Trott, 
+    C. R., Foiles, S. M., & Tucker, G. J.
+    Spectral neighbor analysis method for automated generation of quantum-accurate 
+    interatomic potentials. Journal of Computational Physics, 285, 316-330.
+    [doi:10.1016/j.jcp.12.018](https://doi.org/10.1016/j.jcp.2014.12.018)

@@ -360,7 +360,7 @@ class ElasticConstant(LMPStaticCalculator):
             input_template = f.read()
         with open(os.path.join(template_dir, 'init.template'), 'r') as f:
             init_template = f.read()
-        with open(os.path.join(template_dir, 'potentials.template'), 'r') as f:
+        with open(os.path.join(template_dir, 'potential.template'), 'r') as f:
             potential_template = f.read()
         with open(os.path.join(template_dir, 'displace.template'), 'r') as f:
             displace_template = f.read()
@@ -380,7 +380,7 @@ class ElasticConstant(LMPStaticCalculator):
                                          jiggle=self.jiggle, maxiter=self.maxiter,
                                          maxeval=self.maxeval, lattice=self.lattice,
                                          alat=self.alat))
-        with open('potentials.mod', 'w') as f:
+        with open('potential.mod', 'w') as f:
             f.write(potential_template.format(ff_settings='\n'.join(ff_settings)))
         with open('displace.mod', 'w') as f:
             f.write(displace_template.format(read_restart=self.read_command,

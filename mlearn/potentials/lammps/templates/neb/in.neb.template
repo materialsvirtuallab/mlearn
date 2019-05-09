@@ -1,4 +1,4 @@
-# NEB simulation of vacancy hopping in silicon crystal
+# NEB simulation of vacancy hopping in crystal
 
 units           metal
 
@@ -7,36 +7,9 @@ atom_modify     map array
 boundary        p p p
 atom_modify	sort 0 0.0
 
-# unit cell
+# read start replica
 
-variable a equal {alat}
-lattice         custom $a               &
-                a1 1.0 0.0 0.0          &
-                a2 0.0 1.0 0.0          &
-                a3 0.0 0.0 1.0          &
-{basis}
-
-region          myreg block     0 4 &
-                                0 4 &
-                                0 4
-
-#create_box      1 myreg
-#create_atoms    1 region myreg
-#mass            1       28.06
-#write_data      initial.sivac
-
-read_data       initial.vac
-
-# make a vacancy
-
-group {specie} type 1
-
-#group del id 300
-group del id {del_id}
-delete_atoms group del compress no
-group vacneigh id {vacneigh_ids}
- 
-# choose potential
+read_data       {start_replica}
 
 {ff_settings}
 
@@ -48,13 +21,6 @@ variable	u uloop 20
 
 #dump events vacneigh custom 1000 dump.neb.sivac.$u id type x y z
 
-# initial minimization to relax vacancy
-
-displace_atoms all random 0.1 0.1 0.1 123456
-minimize	1.0e-6 1.0e-4 1000 10000
-
-reset_timestep	0
-
 fix		1 all neb 1.0 
 
 thermo		100
@@ -62,6 +28,6 @@ thermo		100
 # run NEB for 2000 steps or to force tolerance
 
 timestep        0.01
-min_style	quickmin
+min_style       quickmin
 
-neb		0.0 0.01 100 100 10 final final.vac
+neb		0.0 0.01 10000 10000 100 final {final_replica}

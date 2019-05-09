@@ -317,7 +317,7 @@ class NudgedElasticBandTest(unittest.TestCase):
         calculator = NudgedElasticBand(ff_settings=self.ff_settings, specie='Ni',
                                        lattice='fcc', alat=3.506)
         migration_barrier = calculator.calculate()
-        np.testing.assert_almost_equal(migration_barrier, 1.1446, decimal=2)
+        np.testing.assert_almost_equal(migration_barrier, 1.013, decimal=2)
         invalid_calculator = NudgedElasticBand(ff_settings=self.ff_settings, specie='Ni',
                                                lattice='fccc', alat=3.506)
         self.assertRaises(ValueError, invalid_calculator.calculate)

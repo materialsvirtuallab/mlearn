@@ -474,7 +474,7 @@ class NudgedElasticBand(LMPStaticCalculator):
     """
     NudgedElasticBand migration energy calculator.
     """
-    def __init__(self, ff_settings, specie, lattice, alat, num_replicas=8):
+    def __init__(self, ff_settings, specie, lattice, alat, num_replicas=7):
         """
         Args:
             ff_settings (list/Potential): Configure the force field settings for LAMMPS
@@ -532,29 +532,26 @@ class NudgedElasticBand(LMPStaticCalculator):
         unit_cell = self.get_unit_cell(specie=self.specie, lattice=self.lattice,
                                        alat=a)
 
-        super_cell = unit_cell * [4, 4, 4]
-        ld = LammpsData.from_structure(super_cell, atom_style='atomic')
-        ld.write_file('initial.vac')
-
         if self.lattice == 'fcc':
-            del_id = 43
-            vacneigh_ids = [170, 171]
+            start_idx, final_idx = 95, 49
+            scale_factor = [3, 3, 3]
         elif self.lattice == 'bcc':
-            del_id = 43
-            vacneigh_ids = [90, 91]
+            start_idx, final_idx = 40, 14
+            scale_factor = [3, 3, 3]
         elif self.lattice == 'diamond':
-            del_id = 407
-            vacneigh_ids = [342, 214, 87, 471, 167, 283, 43]
+            start_idx, final_idx = 7, 15
+            scale_factor = [2, 2, 2]
         else:
             raise ValueError("Lattice type is invalid.")
 
-        basis = '\n'.join(['                basis {} {} {}  &'.format(*site.frac_coords)
-                           for site in unit_cell])
+        super_cell = unit_cell * scale_factor
+        super_cell_ld = LammpsData.from_structure(super_cell, atom_style='atomic')
+        super_cell_ld.write_file('data.supercell')
+
         with open('in.relax', 'w') as f:
-            f.write(relax_template.format(alat=a, basis=basis, specie=self.specie,
-                                          ff_settings='\n'.join(self.ff_settings.write_param()),
-                                          del_id=del_id, vacneigh_ids=' '.join([str(idx)
-                                          for idx in vacneigh_ids])))
+            f.write(relax_template.format(ff_settings='\n'.join(self.ff_settings.write_param()),
+                                          lattice=self.lattice, alat=a, specie=self.specie,
+                                          del_id=start_idx + 1, relaxed_file='initial.relaxed'))
 
         p = subprocess.Popen([self.LMP_EXE, '-in', 'in.relax'], stdout=subprocess.PIPE)
         stdout = p.communicate()[0]
@@ -571,60 +568,49 @@ class NudgedElasticBand(LMPStaticCalculator):
                 error_msg += msg[-1]
             raise RuntimeError(error_msg)
 
-        ld_relaxed = LammpsData.from_file('data.relaxed', atom_style='atomic')
+        with open('in.relax', 'w') as f:
+            f.write(relax_template.format(ff_settings='\n'.join(self.ff_settings.write_param()),
+                                          lattice=self.lattice, alat=a, specie=self.specie,
+                                          del_id=final_idx + 1, relaxed_file='final.relaxed'))
 
-        if self.lattice == 'fcc':
-            lines = ['2']
-            lines.append('{}  {} {} {}'.format(str(170), *super_cell[169].coords))
-            lines.append('{}  {} {} {}'.format(str(171), *super_cell[42].coords))
-            with open('final.vac', 'w') as f:
-                f.write('\n'.join(lines))
+        p = subprocess.Popen([self.LMP_EXE, '-in', 'in.relax'], stdout=subprocess.PIPE)
+        stdout = p.communicate()[0]
 
-        elif self.lattice == 'bcc':
-            lines = ['2']
-            lines.append('{}  {} {} {}'.format(str(90), *super_cell[89].coords))
-            lines.append('{}  {} {} {}'.format(str(91), *super_cell[42].coords))
-            with open('final.vac', 'w') as f:
-                f.write('\n'.join(lines))
+        rc = p.returncode
+        if rc != 0:
+            error_msg = 'LAMMPS exited with return code %d' % rc
+            msg = stdout.decode("utf-8").split('\n')[:-1]
+            try:
+                error_line = [i for i, m in enumerate(msg)
+                              if m.startswith('ERROR')][0]
+                error_msg += ', '.join([e for e in msg[error_line:]])
+            except:
+                error_msg += msg[-1]
+            raise RuntimeError(error_msg)
 
-        elif self.lattice == 'diamond':
-            lines = ['7']
-            lines.append('{}  {} {} {}'.format(str(342), *super_cell[341].coords))
-            lines.append('{}  {} {} {}'.format(str(214), *super_cell[213].coords))
-            lines.append('{}  {} {} {}'.format(str(87), *super_cell[86].coords))
-            frac_coords = np.concatenate(
-                (ld_relaxed.structure[86].frac_coords[:2] + [0.0625, 0.0625],
-                 super_cell[406].frac_coords[2] + [0.015]))
-            lines.append('{}  {} {} {}'.format(str(471),
-                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
-            frac_coords = np.concatenate(
-                (ld_relaxed.structure[213].frac_coords[:2] + [0.0625, 0.0625],
-                 ld_relaxed.structure[166].frac_coords[2] - [0.01]))
-            lines.append('{}  {} {} {}'.format(str(167),
-                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
-            frac_coords = np.concatenate(
-                (ld_relaxed.structure[341].frac_coords[:2] + [0.0625, 0.0625],
-                 ld_relaxed.structure[282].frac_coords[2] - [0.01]))
-            lines.append('{}  {} {} {}'.format(str(283),
-                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
-            frac_coords = np.concatenate(
-                (ld_relaxed.structure[470].frac_coords[:2] + [0.0625, 0.0625],
-                 ld_relaxed.structure[42].frac_coords[2] + [0.015]))
-            lines.append('{}  {} {} {}'.format(str(43),
-                        *ld_relaxed.structure.lattice.get_cartesian_coords(frac_coords)))
+        final_relaxed_struct = LammpsData.from_file('final.relaxed',
+                                                    atom_style='atomic').structure
 
-        else:
-            raise ValueError("Lattice type is invalid.")
+        lines = ['{}'.format(final_relaxed_struct.num_sites)]
 
-        with open('final.vac', 'w') as f:
+        for idx, site in enumerate(final_relaxed_struct):
+            if idx == final_idx:
+                idx = final_relaxed_struct.num_sites
+            elif idx == start_idx:
+                idx = final_idx
+            else:
+                idx = idx
+            lines.append('{}  {:.3f}  {:.3f}  {:.3f}'.format(idx + 1, site.x, site.y, site.z))
+
+        with open('data.final_replica', 'w') as f:
             f.write('\n'.join(lines))
 
         input_file = 'in.neb'
 
         with open(input_file, 'w') as f:
-            f.write(neb_template.format(alat=a, basis=basis, specie=self.specie,
-                    ff_settings='\n'.join(self.ff_settings.write_param()),
-                    del_id=del_id, vacneigh_ids=' '.join([str(idx) for idx in vacneigh_ids])))
+            f.write(neb_template.format(ff_settings='\n'.join(self.ff_settings.write_param()),
+                                        start_replica='initial.relaxed',
+                                        final_replica='data.final_replica'))
 
         return input_file
 

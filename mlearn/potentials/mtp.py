@@ -556,7 +556,8 @@ class MTPotential(Potential):
                 except:
                     error_msg += msg[-1]
                 raise RuntimeError(error_msg)
-            predict_file = '_'.join([predict_file, '0'])
+            if not os.path.exists(predict_file):
+                predict_file = '_'.join([predict_file, '0'])
             _, df_predict = self.read_cfgs(predict_file, symbol=symbol)
         return df_orig, df_predict
 

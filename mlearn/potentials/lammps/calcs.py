@@ -477,8 +477,8 @@ class NudgedElasticBand(LMPStaticCalculator):
     def __init__(self, ff_settings, specie, lattice, alat, num_replicas=7):
         """
         Args:
-            ff_settings (list/Potential): Configure the force field settings for LAMMPS
-                calculation, if given a Potential object, should apply
+            ff_settings (list/Potential): Configure the force field settings for
+                LAMMPS calculation, if given a Potential object, should apply
                 Potential.write_param method to get the force field setting.
             specie (str): Name of specie.
             lattice (str): The lattice type of structure. e.g. bcc or diamond.
@@ -520,9 +520,9 @@ class NudgedElasticBand(LMPStaticCalculator):
     def _setup(self):
         template_dir = os.path.join(os.path.dirname(__file__), 'templates', 'neb')
 
-        with open(os.path.join(template_dir, 'in.relax.template'), 'r') as f:
+        with open(os.path.join(template_dir, 'in.relax'), 'r') as f:
             relax_template = f.read()
-        with open(os.path.join(template_dir, 'in.neb.template'), 'r') as f:
+        with open(os.path.join(template_dir, 'in.neb'), 'r') as f:
             neb_template = f.read()
 
         unit_cell = self.get_unit_cell(specie=self.specie, lattice=self.lattice,
@@ -652,3 +652,117 @@ class NudgedElasticBand(LMPStaticCalculator):
             lines = f.readlines()[-1:]
         migration_barrier = float(lines[0].split()[6])
         return migration_barrier
+
+class DefectFormation(LMPStaticCalculator):
+    """
+    Defect formation energy calculator.
+    """
+    def __init__(self, ff_settings, specie, lattice, alat):
+        """
+        Args:
+            ff_settings (list/Potential): Configure the force field settings for
+                LAMMPS calculation, if given a Potential object, should apply
+                Potential.write_param method to get the force field setting.
+            specie (str): Name of specie.
+            lattice (str): The lattice type of structure. e.g. bcc or diamond.
+            alat (float): The lattice constant of specific lattice and specie.
+        """
+        self.ff_settings = ff_settings
+        self.specie = specie
+        self.lattice = lattice
+        self.alat = alat
+
+    def get_unit_cell(self, specie, lattice, alat):
+        """
+        Get the unit cell from specie, lattice type and lattice constant.
+
+        Args
+            specie (str): Name of specie.
+            lattice (str): The lattice type of structure. e.g. bcc or diamond.
+            alat (float): The lattice constant of specific lattice and specie.
+        """
+        if lattice == 'fcc':
+            unit_cell = Structure.from_spacegroup(sg='Fm-3m',
+                                                  lattice=Lattice.cubic(alat),
+                                                  species=[specie], coords=[[0, 0, 0]])
+        elif lattice == 'bcc':
+            unit_cell = Structure.from_spacegroup(sg='Im-3m',
+                                                  lattice=Lattice.cubic(alat),
+                                                  species=[specie], coords=[[0, 0, 0]])
+        elif lattice == 'diamond':
+            unit_cell = Structure.from_spacegroup(sg='Fd-3m',
+                                                  lattice=Lattice.cubic(alat),
+                                                  species=[specie], coords=[[0, 0, 0]])
+        else:
+            raise ValueError("Lattice type is invalid.")
+
+        return unit_cell
+
+    def _setup(self):
+        template_dir = os.path.join(os.path.dirname(__file__), 'templates', 'defect')
+
+        with open(os.path.join(template_dir, 'in.defect'), 'r') as f:
+            defect_template = f.read()
+
+        unit_cell = self.get_unit_cell(specie=self.specie, lattice=self.lattice,
+                                       alat=self.alat)
+        lattice_calculator = LatticeConstant(ff_settings=self.ff_settings)
+        a, _, _ = lattice_calculator.calculate([unit_cell])[0]
+        unit_cell = self.get_unit_cell(specie=self.specie, lattice=self.lattice,
+                                       alat=a)
+
+        if self.lattice == 'fcc':
+            idx, scale_factor = 95, [3, 3, 3]
+        elif self.lattice == 'bcc':
+            idx, scale_factor = 40, [3, 3, 3]
+        elif self.lattice == 'diamond':
+            idx, scale_factor = 7, [2, 2, 2]
+        else:
+            raise ValueError("Lattice type is invalid.")
+
+        super_cell = unit_cell * scale_factor
+        efs_calculator = EnergyForceStress(ff_settings=self.ff_settings)
+        energy_per_atom = efs_calculator.calculate([super_cell])[0][0] / len(super_cell)
+
+        super_cell_ld = LammpsData.from_structure(super_cell, atom_style='atomic')
+        super_cell_ld.write_file('data.supercell')
+
+        input_file = 'in.defect'
+
+        with open(input_file, 'w') as f:
+            f.write(defect_template.format(ff_settings='\n'.join(self.ff_settings.write_param()),
+                                           lattice=self.lattice, alat=a, specie=self.specie,
+                                           del_id=idx + 1, relaxed_file='data.relaxed'))
+
+        return input_file, energy_per_atom, len(super_cell) - 1
+
+    def calculate(self):
+        with ScratchDir('.'):
+            input_file, energy_per_atom, num_atoms = self._setup()
+            p = subprocess.Popen([self.LMP_EXE, '-in', input_file], stdout=subprocess.PIPE)
+            stdout = p.communicate()[0]
+
+            rc = p.returncode
+            if rc != 0:
+                error_msg = 'LAMMPS exited with return code %d' % rc
+                msg = stdout.decode("utf-8").split('\n')[:-1]
+                try:
+                    error_line = [i for i, m in enumerate(msg)
+                                  if m.startswith('ERROR')][0]
+                    error_msg += ', '.join([e for e in msg[error_line:]])
+                except:
+                    error_msg += msg[-1]
+                raise RuntimeError(error_msg)
+            defect_energy, _, _ = self._parse()
+        defect_formation_energy = defect_energy - energy_per_atom * num_atoms
+
+        return defect_formation_energy
+
+    def _sanity_check(self, structure):
+        return True
+
+    def _parse(self):
+        energy = float(np.loadtxt('energy.txt'))
+        force = _read_dump('force.dump')
+        stress = np.loadtxt('stress.txt')
+        return energy, force, stress

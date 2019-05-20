@@ -25,7 +25,7 @@ delete_atoms group del compress no
 {ff_settings}
 
 # initial minimization to relax vacancy
-min_style        cg
-minimize	 1.0e-6 1.0e-4 1000 10000
+min_style       cg
+minimize	    1.0e-6 1.0e-4 1000 10000
 
-write_data       {relaxed_file}
+write_data      {relaxed_file}

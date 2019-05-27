@@ -15,6 +15,7 @@ from mlearn.potentials.mtp import MTPotential
 
 CWD = os.getcwd()
 test_datapool = loadfn(os.path.join(os.path.dirname(__file__), 'datapool.json'))
+config_file = os.path.join(os.path.dirname(__file__), 'MTP', 'fitted.mtp')
 
 class MTPotentialTest(unittest.TestCase):
 
@@ -57,16 +58,14 @@ class MTPotentialTest(unittest.TestCase):
             forces1 = np.array(data1['outputs']['forces'])
             forces2 = data2['outputs']['forces']
             np.testing.assert_array_almost_equal(forces1, forces2)
-            stress1 = np.array(data1['outputs']['virial_stress'])
-            stress2 = data2['outputs']['virial_stress']
-            np.testing.assert_array_almost_equal(stress1, stress2)
 
     @unittest.skipIf(not which('mlp'), 'No MLIP cmd found.')
     def test_train(self):
         self.potential.train(train_structures=self.test_structures,
                              energies=self.test_energies,
                              forces=self.test_forces,
-                             stresses=self.test_stresses)
+                             stresses=self.test_stresses, unfitted_mtp='08g.mtp',
+                             max_dist=3.0, max_iter=20)
         self.assertTrue(self.potential.param)
 
     @unittest.skipIf(not which('mlp'), 'No MLIP cmd found.')
@@ -74,7 +73,8 @@ class MTPotentialTest(unittest.TestCase):
         self.potential.train(train_structures=self.test_structures,
                              energies=self.test_energies,
                              forces=self.test_forces,
-                             stresses=self.test_stresses)
+                             stresses=self.test_stresses, unfitted_mtp='08g.mtp',
+                             max_dist=3.0, max_iter=20)
         df_orig, df_tar = self.potential.evaluate(test_structures=self.test_structures,
                                                   ref_energies=self.test_energies,
                                                   ref_forces=self.test_forces,
@@ -87,10 +87,15 @@ class MTPotentialTest(unittest.TestCase):
         self.potential.train(train_structures=self.test_structures,
                              energies=self.test_energies,
                              forces=self.test_forces,
-                             stresses=self.test_stresses)
+                             stresses=self.test_stresses, unfitted_mtp='08g.mtp',
+                             max_dist=3.0, max_iter=20)
         energy, forces, stress = self.potential.predict(self.test_struct)
         self.assertEqual(len(forces), len(self.test_struct))
         self.assertEqual(len(stress), 6)
+
+    def test_from_config(self):
+        mtp = MTPotential.from_config(config_file)
+        self.assertIsNotNone(mtp.param)
 
 if __name__ == '__main__':
     unittest.main()

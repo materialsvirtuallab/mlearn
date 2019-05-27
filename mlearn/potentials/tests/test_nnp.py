@@ -15,6 +15,9 @@ from mlearn.potentials.nnp import NNPotential
 
 CWD = os.getcwd()
 test_datapool = loadfn(os.path.join(os.path.dirname(__file__), 'datapool.json'))
+input_file = os.path.join(os.path.dirname(__file__), 'NNP', 'input.nn')
+scaling_file = os.path.join(os.path.dirname(__file__), 'NNP', 'scaling.data')
+weights_file = os.path.join(os.path.dirname(__file__), 'NNP', 'weights.data')
 
 class NNPitentialTest(unittest.TestCase):
 
@@ -69,10 +72,10 @@ class NNPitentialTest(unittest.TestCase):
                              atom_energy=-4.14, r_cut=5.0,
                              hidden_layers=hidden_layers, activations=activations,
                              epochs=1)
-        self.assertTrue(self.potential.train_energy_rmse)
-        self.assertTrue(self.potential.train_forces_rmse)
-        self.assertTrue(self.potential.validation_energy_rmse)
-        self.assertTrue(self.potential.validation_forces_rmse)
+        self.assertTrue(self.potential.train_energy_rmse is not None)
+        self.assertTrue(self.potential.train_forces_rmse is not None)
+        self.assertTrue(self.potential.validation_energy_rmse is not None)
+        self.assertTrue(self.potential.validation_forces_rmse is not None)
 
     @unittest.skipIf(not which('nnp-train'), 'No nnp-train cmd found.')
     @unittest.skipIf(not which('nnp-predict'), 'No nnp-train cmd found.')
@@ -103,6 +106,10 @@ class NNPitentialTest(unittest.TestCase):
         energy, forces, stress = self.potential.predict(self.test_struct)
         self.assertEqual(len(forces), len(self.test_struct))
         self.assertEqual(len(stress), 6)
+
+    def test_from_config(self):
+        nnp = NNPotential.from_config(input_file, scaling_file, weights_file)
+        self.assertTrue(nnp.fitted)
 
 if __name__ == '__main__':
     unittest.main()

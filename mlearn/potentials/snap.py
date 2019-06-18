@@ -199,7 +199,8 @@ class SNAPotential(Potential):
 
         describer = BispectrumCoefficients(rcutfac=rcut, twojmax=twojmax,
                                            rfac0=rfac, element_profile=element_profile,
-                                           rmin0=rmin, diagonalstyle=diagonal, quadratic=quadratic)
+                                           rmin0=rmin, diagonalstyle=diagonal, quadratic=quadratic,
+                                           pot_fit=True)
         model = LinearModel(describer=describer, **kwargs)
         model.model.coef_ = np.array(coeff_lines[2:], dtype=np.float)
         model.model.intercept_ = 0

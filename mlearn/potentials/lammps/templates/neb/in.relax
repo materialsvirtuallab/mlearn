@@ -25,6 +25,8 @@ delete_atoms group del compress no
 {ff_settings}
 
 # initial minimization to relax vacancy
+fix 1 all box/relax iso 0.0 vmax 0.001
+
 min_style       cg
 minimize	    1.0e-6 1.0e-4 1000 10000
 

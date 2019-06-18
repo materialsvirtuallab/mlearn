@@ -311,7 +311,7 @@ class GAPotential(Potential):
 
         return rc
 
-    def write_param(self, xml_filename='soap.xml'):
+    def write_param(self, xml_filename='gap.xml'):
         """
         Write xml file to perform lammps calculation.
 

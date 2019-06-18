@@ -74,7 +74,7 @@ of other versions.)
 make serial
 ```
 
-## Moment Tensor Potential (MTP)**
+## Moment Tensor Potential (MTP)
 
 Clone the [MLIP](http://gitlab.skoltech.ru/shapeev/mlip-dev) repository. This 
 repository is under development, please refer to 
@@ -166,7 +166,12 @@ of other versions.)
 make serial
 ```
 
-## Spectral Neighbor Analysis Potential (SNAP)**
+## Spectral Neighbor Analysis Potential (SNAP)
+
+Note: The current `SNAP` submodule is guaranteed to be compatible with stable version 
+of [LAMMPS-12Dec2018](https://github.com/lammps/lammps/releases/tag/stable_12Dec2018). Further 
+efforts will be made to ensure `SNAP` submodule compatible with
+[newest version](https://lammps.sandia.gov/download.html) of LAMMPS.
 
 The calculations rely on [LAMMPS package](https://lammps.sandia.gov) itself. 
 Assume `LMP_ROOT` is the path of LAMMPS package. To install SNAP package, enable 
@@ -180,4 +185,4 @@ The serial version of LAMMPS containing SNAP interface can then be installed.
 of other versions.)
 ```
 make serial
-``` 
+```

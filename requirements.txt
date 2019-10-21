@@ -1,4 +1,4 @@
-pandas==0.25.1
+pandas==0.25.2
 pymatgen==2019.10.16
 scikit-learn==0.21.3
 numpy==1.17.3

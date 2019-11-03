@@ -15,7 +15,8 @@ from monty.io import zopen
 from monty.os.path import which
 from monty.tempfile import ScratchDir
 from monty.serialization import loadfn
-from pymatgen import Structure, Lattice, Element, units
+from pymatgen import Structure, Lattice, Element
+from pymatgen.core import units
 
 from mlearn.potentials import Potential
 from mlearn.data import pool_from, convert_docs

@@ -8,7 +8,7 @@ scale_max_short                 1.0
 global_hidden_layers_short      2
 global_nodes_short              24 24
 global_activation_short         t t l
-epochs                          8
+epochs                          24
 updater_type                    1
 parallel_mode                   0
 update_strategy                 1
@@ -36,30 +36,30 @@ kalman_eta                      0.01
 kalman_etatau                   2.302
 kalman_etamax                   1.0
 use_short_forces
-symfunction_short Si  2 Si    0.0100000    0.0000000    9.8265759
-symfunction_short Si  2 Si    0.0200000    0.0000000    9.8265759
-symfunction_short Si  2 Si    0.0500000    0.0000000    9.8265759
-symfunction_short Si  2 Si    0.1000000    0.0000000    9.8265759
-symfunction_short Si  2 Si    0.2000000    0.0000000    9.8265759
-symfunction_short Si  2 Si    0.5000000    0.0000000    9.8265759
-symfunction_short Si  2 Si    1.0000000    0.0000000    9.8265759
-symfunction_short Si  2 Si    2.0000000    0.0000000    9.8265759
-symfunction_short Si  2 Si    5.0000000    0.0000000    9.8265759
-symfunction_short Si  3 Si Si    0.0100000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.0100000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.0200000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.0200000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.0500000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.0500000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.1000000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.1000000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.2000000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.2000000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.5000000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    0.5000000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    1.0000000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    1.0000000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    2.0000000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    2.0000000  1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    5.0000000 -1 1.0000000   9.8265759
-symfunction_short Si  3 Si Si    5.0000000  1 1.0000000   9.8265759
+symfunction_short Si  2 Si    0.0100000    7.5589045    10.3934937
+symfunction_short Si  2 Si    0.0200000    7.5589045    10.3934937
+symfunction_short Si  2 Si    0.0500000    7.5589045    10.3934937
+symfunction_short Si  3 Si Si    0.0100000 -1 1.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000 -1 16.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000 -1 2.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000 -1 4.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000  1 1.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000  1 16.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000  1 2.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0100000  1 4.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000 -1 1.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000 -1 16.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000 -1 2.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000 -1 4.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000  1 1.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000  1 16.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000  1 2.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0200000  1 4.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000 -1 1.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000 -1 16.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000 -1 2.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000 -1 4.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000  1 1.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000  1 16.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000  1 2.0000000   10.3934937
+symfunction_short Si  3 Si Si    0.0500000  1 4.0000000   10.3934937

@@ -500,8 +500,8 @@ class NNPotential(Potential):
             scaling_lines = f.readlines()
         scaling_param = pd.DataFrame([line.split() for line in scaling_lines \
                                       if '#' not in line])
-        scaling_param.column = ['e_index', 'sf_index', 'sf_min', 'sf_max', \
-                                'sf_mean', 'sf_sigma']
+        # scaling_param.column = ['e_index', 'sf_index', 'sf_min', 'sf_max', \
+        #                         'sf_mean', 'sf_sigma']
         self.scaling_param = scaling_param
 
     def read_cfgs(self, filename='output.data'):

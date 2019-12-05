@@ -11,8 +11,11 @@ global_activation_short         t t l
 epochs                          16
 updater_type                    1
 parallel_mode                   0
+jacobian_mode                   1
 update_strategy                 1
 selection_mode                  2
+task_batch_size_energy          1
+task_batch_size_force           1
 random_seed                     123456
 test_fraction                   1e-06
 force_weight                    10.0

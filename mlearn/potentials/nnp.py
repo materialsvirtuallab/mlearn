@@ -157,10 +157,18 @@ class NNPotential(Potential):
                         0: gradient Descent, 1: Kalman filter.
                     parallel_mode (int): Training parallelization used.
                         Default to serial mode.
+                    jacobian_mode (int): Jacobian computation mode.
+                        0: Summation to single gradient,
+                        1: Per-task summed gradient,
+                        2: Full Jacobian.
                     update_strategy (int): Update strategy.
                         0: combined, 1: per-element.
                     selection_mode (int): Update candidate selection mode.
                         0: random, 1: sort, 2: threshold
+                    task_batch_size_energy (int): Number of energy update
+                        candidates prepared per task for each update.
+                    task_batch_size_force (int): Number of force update
+                        candidates prepared per task for each update.
                     test_fraction (float): Fraction of structures kept for
                         testing.
                     force_weight (float): Weight of force updates relative
@@ -228,9 +236,10 @@ class NNPotential(Potential):
 
         PARAMS = {'general': ['cutoff_type', 'scale_features', 'scale_min_short',
                               'scale_max_short', 'hidden_layers'],
-                  'additional': ['epochs', 'updater_type', 'parallel_mode',
-                                 'update_strategy', 'selection_mode', 'random_seed',
-                                 'test_fraction', 'force_weight', 'short_energy_fraction',
+                  'additional': ['epochs', 'updater_type', 'parallel_mode', 'jacobian_mode',
+                                 'update_strategy', 'selection_mode', 'task_batch_size_energy',
+                                 'task_batch_size_force', 'random_seed', 'test_fraction',
+                                 'force_weight', 'short_energy_fraction',
                                  'short_force_fraction', 'short_energy_error_threshold',
                                  'short_force_error_threshold', 'rmse_threshold_trials',
                                  'weights_min', 'weights_max', 'write_trainpoints',
@@ -380,8 +389,9 @@ class NNPotential(Potential):
         """
         PARAMS = {'general': ['cutoff_type', 'scale_features', 'scale_min_short',
                               'scale_max_short', 'hidden_layers'],
-                  'additional': ['epochs', 'updater_type', 'parallel_mode',
-                                 'update_strategy', 'selection_mode', 'random_seed',
+                  'additional': ['epochs', 'updater_type', 'parallel_mode', 'jacobian_mode',
+                                 'update_strategy', 'selection_mode', 'task_batch_size_energy',
+                                 'task_batch_size_force', 'random_seed',
                                  'test_fraction', 'force_weight', 'short_energy_fraction',
                                  'short_force_fraction', 'short_energy_error_threshold',
                                  'short_force_error_threshold', 'rmse_threshold_trials',

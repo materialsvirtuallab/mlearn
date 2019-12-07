@@ -48,7 +48,7 @@ jobs:
             source activate test_env
             pip install --quiet -e .
             mkdir coverage_reports
-            nosetests --config=nose.cfg --process-timeout=600 --cover-html --cover-html-dir=$CIRCLE_ARTIFACTS mlearn
+            pytest --cov=mlearn --cov-report html:coverage_reports mlearn
             coveralls
           no_output_timeout: 3600
       - store_artifacts:

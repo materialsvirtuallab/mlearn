@@ -11,7 +11,6 @@ import shutil
 import subprocess
 from collections import OrderedDict
 
-
 import numpy as np
 from monty.io import zopen
 from monty.os.path import which
@@ -26,6 +25,7 @@ from mlearn.potentials.lammps.calcs import EnergyForceStress
 module_dir = os.path.dirname(__file__)
 MTini_params = loadfn(os.path.join(module_dir, 'params', 'MTini.json'))
 
+
 def feed(attribute, kwargs, dictionary, tab='\t'):
     """
 
@@ -38,9 +38,10 @@ def feed(attribute, kwargs, dictionary, tab='\t'):
         (str)
     """
     tmp = kwargs.get(attribute) if kwargs.get(attribute) \
-                        else dictionary.get(attribute).get('value')
+        else dictionary.get(attribute).get('value')
     return tab + dictionary.get(attribute).get('name'), str(tmp), \
-                    dictionary.get(attribute).get('comment')
+           dictionary.get(attribute).get('comment')
+
 
 class MTPotential(Potential):
     """
@@ -78,10 +79,10 @@ class MTPotential(Potential):
         if len(structure.symbol_set) > 1:
             raise ValueError("Structure is not unary.")
 
-        inputs = OrderedDict(Size=structure.num_sites, \
-                             SuperCell=structure.lattice, \
-                             AtomData=(structure, forces), \
-                             Energy=energy, \
+        inputs = OrderedDict(Size=structure.num_sites,
+                             SuperCell=structure.lattice,
+                             AtomData=(structure, forces),
+                             Energy=energy,
                              Stress=virial_stress)
 
         lines = ['BEGIN_CFG']
@@ -96,10 +97,10 @@ class MTPotential(Potential):
         if 'AtomData' in inputs:
             format_str = '{:>14s}{:>5s}{:>15s}{:>14s}{:>14s}{:>13s}{:>13s}{:>13s}'
             format_float = '{:>14d}{:>5d}{:>15f}{:>14f}{:>14f}{:>13f}{:>13f}{:>13f}'
-            lines.append(format_str.format('AtomData:  id', 'type', \
-                'cartes_x', 'cartes_y', 'cartes_z', 'fx', 'fy', 'fz'))
+            lines.append(format_str.format('AtomData:  id', 'type',
+                                           'cartes_x', 'cartes_y', 'cartes_z', 'fx', 'fy', 'fz'))
             for i, (site, force) in enumerate(zip(structure, forces)):
-                lines.append(format_float.format(i+1, 0, *site.coords, *force))
+                lines.append(format_float.format(i + 1, 0, *site.coords, *force))
         if 'Energy' in inputs:
             lines.append(' Energy')
             lines.append('{:>24.12f}'.format(inputs['Energy']))
@@ -295,7 +296,7 @@ class MTPotential(Potential):
 
         if Abinitio:
             lines.append(format_str.format(MTini_params.get('Abinitio').get('name'), \
-                            str(Abinitio), MTini_params.get('Abinitio').get('comment')))
+                                           str(Abinitio), MTini_params.get('Abinitio').get('comment')))
             abinitio = MTini_params.get('Abinitio').get(str(Abinitio))
             lines.append(format_str.format(abinitio.get('name'), '', \
                                            abinitio.get('comment')))
@@ -304,7 +305,7 @@ class MTPotential(Potential):
 
         if MLIP:
             lines.append(format_str.format(MTini_params.get('MLIP').get('name'), \
-                            'mtpr', MTini_params.get('MLIP').get('comment')))
+                                           'mtpr', MTini_params.get('MLIP').get('comment')))
             mlip = MTini_params.get('MLIP')
             if kwargs.get('load_from'):
                 load_from = mlip.get('load_from')
@@ -313,29 +314,29 @@ class MTPotential(Potential):
             if kwargs.get('Calculate_EFS'):
                 calc_efs = mlip.get('Calculate_EFS')
                 lines.append(format_str.format('\t' + calc_efs.get('name'),
-                                                'TRUE', calc_efs.get('comment')))
+                                               'TRUE', calc_efs.get('comment')))
             if kwargs.get('Fit'):
                 fit = mlip.get('Fit')
-                lines.append(format_str.format('\t'+fit.get('name'),
-                                        'true', fit.get('comment')))
+                lines.append(format_str.format('\t' + fit.get('name'),
+                                               'true', fit.get('comment')))
                 for attribute in PARAMS['MLIP']['Fit']:
                     lines.append(format_str.format(*feed(attribute, kwargs, fit, tab='\t\t')))
 
             if kwargs.get('Select'):
                 select = mlip.get('Select')
-                lines.append(format_str.format('\t'+select.get('name'),
-                                        'true', select.get('comment')))
+                lines.append(format_str.format('\t' + select.get('name'),
+                                               'true', select.get('comment')))
                 for attribute in PARAMS['MLIP']['Select']:
                     lines.append(format_str.format(*feed(attribute, kwargs, select, tab='\t\t')))
 
             if kwargs.get('Write_cfgs'):
                 write_cfgs = mlip.get('Write_cfgs')
-                lines.append(format_str.format('\t'+write_cfgs.get('name'),
-                                kwargs.get('Write_cfgs'), write_cfgs.get('comment')))
+                lines.append(format_str.format('\t' + write_cfgs.get('name'),
+                                               kwargs.get('Write_cfgs'), write_cfgs.get('comment')))
 
         if Driver:
             lines.append(format_str.format(MTini_params.get('Driver').get('name'), \
-                            str(Driver), MTini_params.get('Driver').get('comment')))
+                                           str(Driver), MTini_params.get('Driver').get('comment')))
             driver = MTini_params.get('Driver').get(str(Driver))
             lines.append(format_str.format(driver.get('name'), '', \
                                            driver.get('comment')))
@@ -361,14 +362,14 @@ class MTPotential(Potential):
             lines = f.read()
 
         block_pattern = re.compile('BEGIN_CFG\n(.*?)\nEND_CFG', re.S)
-        size_pattern = re.compile('Size\n(.*?)\n SuperCell', re.S|re.I)
-        lattice_pattern = re.compile('SuperCell\n(.*?)\n AtomData', re.S|re.I)
+        size_pattern = re.compile('Size\n(.*?)\n SuperCell', re.S | re.I)
+        lattice_pattern = re.compile('SuperCell\n(.*?)\n AtomData', re.S | re.I)
         position_pattern = re.compile('fz\n(.*?)\n Energy', re.S)
         energy_pattern = re.compile('Energy\n(.*?)\n (?=PlusStress|Stress)', re.S)
         stress_pattern = re.compile('xy\n(.*?)(?=\n|$)', re.S)
         formatify = lambda string: [float(s) for s in string.split()]
         for block in block_pattern.findall(lines):
-            d = {'outputs':{}}
+            d = {'outputs': {}}
             size_str = size_pattern.findall(block)[0]
             size = int(size_str.lstrip())
             lattice_str = lattice_pattern.findall(block)[0]
@@ -397,8 +398,8 @@ class MTPotential(Potential):
         return data_pool, df
 
     def train(self, train_structures, energies=None, forces=None, stresses=None,
-                    unfitted_mtp=None, max_dist=5, radial_basis_size=8, max_iter=500,
-                    energy_weight=1, force_weight=1e-2, stress_weight=0):
+              unfitted_mtp=None, max_dist=5, radial_basis_size=8, max_iter=500,
+              energy_weight=1, force_weight=1e-2, stress_weight=0):
         """
         Training data with moment tensor method.
 
@@ -445,7 +446,7 @@ class MTPotential(Potential):
                 f.write(s)
 
             save_fitted_mtp = '.'.join(
-                [unfitted_mtp.split('.')[0]+'_fitted', unfitted_mtp.split('.')[1]])
+                [unfitted_mtp.split('.')[0] + '_fitted', unfitted_mtp.split('.')[1]])
 
             p = subprocess.Popen(['mlp', 'train',
                                   unfitted_mtp, atoms_filename,
@@ -494,8 +495,8 @@ class MTPotential(Potential):
         if not self.param:
             raise RuntimeError("The parameters should be provided.")
         lines = [' = '.join([key, json.dumps(value).replace('[', '{').replace(']', '}')])
-                                    if key != 'safe' else '\n'.join(value)
-                                    for key, value in self.param.items()]
+                 if key != 'safe' else '\n'.join(value)
+                 for key, value in self.param.items()]
         with open(fitted_mtp, 'w') as f:
             f.write('\n'.join(lines))
         ini_file = self.write_ini(load_from=fitted_mtp, Calculate_EFS=True, **kwargs)
@@ -503,7 +504,7 @@ class MTPotential(Potential):
         return ff_settings
 
     def evaluate(self, test_structures, ref_energies=None,
-                    ref_forces=None, ref_stresses=None, **kwargs):
+                 ref_forces=None, ref_stresses=None, **kwargs):
         """
         Evaluate energies, forces and stresses of structures with trained
         interatomic potentials.
@@ -543,7 +544,7 @@ class MTPotential(Potential):
 
             p = subprocess.Popen(['mlp', 'run', 'mlip.ini',
                                   '--filename={}'.format(original_file)],
-                                  stdout=subprocess.PIPE)
+                                 stdout=subprocess.PIPE)
             stdout = p.communicate()[0]
             rc = p.returncode
             if rc != 0:
@@ -617,5 +618,6 @@ class MTPotential(Potential):
                         line.rstrip().split(' = ')[1].replace('{', '[').replace('}', ']'))
                     param[key] = value
                 return param
+
             param = load_config(filename)
             return MTPotential(param=param)

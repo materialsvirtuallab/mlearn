@@ -61,10 +61,10 @@ class GAPotential(Potential):
                               virial_stress[3], virial_stress[1], virial_stress[4],
                               virial_stress[5], virial_stress[4], virial_stress[2]]
 
-        inputs = OrderedDict(Size=structure.num_sites, \
-                             SuperCell=structure.lattice, \
-                             AtomData=(structure, forces), \
-                             Energy=energy, \
+        inputs = OrderedDict(Size=structure.num_sites,
+                             SuperCell=structure.lattice,
+                             AtomData=(structure, forces),
+                             Energy=energy,
                              Stress=full_virial_stress)
 
         lines = []
@@ -86,8 +86,7 @@ class GAPotential(Potential):
         if 'AtomData' in inputs:
             format_str = '{:<10s}{:>16f}{:>16f}{:>16f}{:>8d}{:>16f}{:>16f}{:>16f}'
             for i, (site, force) in enumerate(zip(structure, forces)):
-                lines.append(format_str.format(site.species_string, \
-                                               *site.coords, site.specie.Z, *force))
+                lines.append(format_str.format(site.species_string, *site.coords, site.specie.Z, *force))
         return '\n'.join(lines)
 
     def write_cfgs(self, filename, cfg_pool):
@@ -125,13 +124,13 @@ class GAPotential(Potential):
         repl = re.compile('AT ')
         lines = repl.sub('', string=lines)
 
-        block_pattern = re.compile('(\n[0-9]+\n|^[0-9]+\n)(.+?)(?=\n[0-9]+\n|$)', re.S)
-        lattice_pattern = re.compile('Lattice="(.+)"')
+        block_pattern = re.compile(r'(\n[0-9]+\n|^[0-9]+\n)(.+?)(?=\n[0-9]+\n|$)', re.S)
+        lattice_pattern = re.compile(r'Lattice="(.+)"')
         # energy_pattern = re.compile('dft_energy=(-?[0-9]+.[0-9]+)', re.I)
-        energy_pattern = re.compile('(?<=\S{3}\s|dft_)energy=(-?[0-9]+.[0-9]+)')
+        energy_pattern = re.compile(r'(?<=\S{3}\s|dft_)energy=(-?[0-9]+.[0-9]+)')
         # stress_pattern = re.compile('dft_virial={(.+)}')
-        stress_pattern = re.compile('dft_virial=({|)(.+?)(}|) \S.*')
-        properties_pattern = re.compile('properties=(\S+)', re.I)
+        stress_pattern = re.compile(r'dft_virial=({|)(.+?)(}|) \S.*')
+        properties_pattern = re.compile(r'properties=(\S+)', re.I)
         # position_pattern = re.compile('\n(.+)', re.S)
         position_pattern = re.compile('\n(.+?)(?=\nE.*|\n\n.*|$)', re.S)
         # formatify = lambda string: [float(s) for s in string.split()]
@@ -158,10 +157,9 @@ class GAPotential(Potential):
             column_index = 0
             for key in labels_columns:
                 num_columns, dtype = labels_columns[key]
-                labels[key] = position[:, column_index: \
-                                          column_index + num_columns].astype(type_convert[dtype])
+                labels[key] = position[:, column_index: column_index + num_columns].astype(type_convert[dtype])
                 column_index += num_columns
-            struct = Structure(lattice=lattice, species=labels['species'].ravel(), \
+            struct = Structure(lattice=lattice, species=labels['species'].ravel(),
                                coords=labels['pos'], coords_are_cartesian=True)
             if predict:
                 forces = labels['force']
@@ -247,8 +245,8 @@ class GAPotential(Potential):
 
         exe_command = ["teach_sparse"]
         exe_command.append('at_file={}'.format(atoms_filename))
-        gap_configure_params = ['l_max', 'n_max', 'atom_sigma', 'zeta', 'cutoff', \
-                                'cutoff_transition_width', 'delta', 'f0', 'n_sparse', \
+        gap_configure_params = ['l_max', 'n_max', 'atom_sigma', 'zeta', 'cutoff',
+                                'cutoff_transition_width', 'delta', 'f0', 'n_sparse',
                                 'covariance_type', 'sparse_method']
         preprocess_params = ['sparse_jitter', 'e0', 'e0_offset']
         target_for_training = ['use_energies', 'use_forces', 'use_stress']
@@ -328,7 +326,7 @@ class GAPotential(Potential):
         np.savetxt(param_filename, self.param.get('param'))
         tree.write(xml_filename)
         pair_coeff = self.pair_coeff.format(xml_filename,
-                                            '\"Potential xml_label={}\"'. \
+                                            '\"Potential xml_label={}\"'.
                                             format(self.param.get('potential_label')),
                                             self.specie.Z)
         ff_settings = [self.pair_style, pair_coeff]

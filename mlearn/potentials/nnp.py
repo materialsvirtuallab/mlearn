@@ -368,7 +368,7 @@ class NNPotential(Potential):
                                                  zeta=zeta, rcut=r_cut))
 
             self.num_symm_functions = len(list(itertools.product(r_etas, r_shift))) \
-                                      + len(list(itertools.product(a_etas, lambdas, zetas)))
+                + len(list(itertools.product(a_etas, lambdas, zetas)))
             self.layer_sizes = [self.num_symm_functions] + self.param.get('hidden_layers')
 
         with open(filename, 'w') as f:
@@ -416,8 +416,7 @@ class NNPotential(Potential):
                     if len(df[df[0] == 'scale_symmetry_functions']) != 0 else 0
                 param.update({'scale_features': scale_features})
             elif tag == 'hidden_layers':
-                hidden_layers = [int(neuron) for neuron in np.array(df[df[0] \
-                                                                       == 'global_nodes_short'])[0][1:] if neuron]
+                hidden_layers = [int(neuron) for neuron in np.array(df[df[0] == 'global_nodes_short'])[0][1:] if neuron]
                 param.update({'hidden_layers': hidden_layers})
                 activations = np.array(df[df[0] == 'global_activation_short'])[0][1]
                 param.update({'activations': activations})
@@ -452,7 +451,7 @@ class NNPotential(Potential):
                          dtype=np.float).tolist()
         param.update({'zetas': zetas})
         self.num_symm_functions = len(list(itertools.product(r_etas, r_shift))) \
-                                  + len(list(itertools.product(a_etas, lambdas, zetas)))
+            + len(list(itertools.product(a_etas, lambdas, zetas)))
         self.layer_sizes = [self.num_symm_functions] + hidden_layers
         self.param = param
 
@@ -466,13 +465,13 @@ class NNPotential(Potential):
         with open(weights_filename) as f:
             weights_lines = f.readlines()
 
-        weight_param = pd.DataFrame([line.split() for line in weights_lines \
+        weight_param = pd.DataFrame([line.split() for line in weights_lines
                                      if "#" not in line])
         weight_param.columns = ['value', 'type', 'index', 'start_layer',
                                 'start_neuron', 'end_layer', 'end_neuron']
 
         for layer_index in range(1, len(self.layer_sizes)):
-            weights_group = weight_param[(weight_param['start_layer'] == str(layer_index - 1)) \
+            weights_group = weight_param[(weight_param['start_layer'] == str(layer_index - 1))
                                          & (weight_param['end_layer'] == str(layer_index))]
 
             weights = np.reshape(np.array(weights_group['value'], dtype=np.float),
@@ -496,7 +495,7 @@ class NNPotential(Potential):
         """
         with open(scaling_filename) as f:
             scaling_lines = f.readlines()
-        scaling_param = pd.DataFrame([line.split() for line in scaling_lines \
+        scaling_param = pd.DataFrame([line.split() for line in scaling_lines
                                       if '#' not in line])
         # scaling_param.column = ['e_index', 'sf_index', 'sf_min', 'sf_max', \
         #                         'sf_mean', 'sf_sigma']
@@ -627,8 +626,8 @@ class NNPotential(Potential):
             with zopen(output) as f:
                 error_lines = f.read()
 
-            energy_rmse_pattern = re.compile('ENERGY\s*\S*\s*(\S*)\s*(\S*).*?\n')
-            forces_rmse_pattern = re.compile('FORCES\s*\S*\s*(\S*)\s*(\S*).*?\n')
+            energy_rmse_pattern = re.compile(r'ENERGY\s*\S*\s*(\S*)\s*(\S*).*?\n')
+            forces_rmse_pattern = re.compile(r'FORCES\s*\S*\s*(\S*)\s*(\S*).*?\n')
             self.train_energy_rmse, self.validation_energy_rmse = \
                 np.array([line for line in energy_rmse_pattern.findall(error_lines)],
                          dtype=np.float).T

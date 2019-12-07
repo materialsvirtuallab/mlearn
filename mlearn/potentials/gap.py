@@ -4,7 +4,7 @@
 
 import re
 import os
-import yaml
+import ruamel.yaml as yaml
 import subprocess
 import xml.etree.ElementTree as ET
 from collections import OrderedDict, defaultdict

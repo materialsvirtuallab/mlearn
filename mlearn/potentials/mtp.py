@@ -6,7 +6,7 @@
 import os
 import re
 import json
-import yaml
+import ruamel.yaml as yaml
 import shutil
 import subprocess
 from collections import OrderedDict

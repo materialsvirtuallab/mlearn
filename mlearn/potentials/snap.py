@@ -117,8 +117,6 @@ class SNAPotential(Potential):
         nbc = len(describer.subscripts)
         if describer.quadratic:
             nbc += int((1 + nbc) * nbc / 2)
-        tjm = describer.twojmax
-        diag = describer.diagonalstyle
 
         coeff_lines = []
         coeff_lines.append('{} {}'.format(ne, nbc + 1))
@@ -178,12 +176,12 @@ class SNAPotential(Potential):
         r, w = float(r), int(w)
         element_profile = {specie: {'r': r, 'w': w}}
 
-        rcut_pattern = re.compile('rcutfac (.*?)\n', re.S)
-        twojmax_pattern = re.compile('twojmax (\d*)\n', re.S)
-        rfac_pattern = re.compile('rfac0 (.*?)\n', re.S)
-        rmin_pattern = re.compile('rmin0 (.*?)\n', re.S)
-        diagonalstyle_pattern = re.compile('diagonalstyle (.*?)\n', re.S)
-        quadratic_pattern = re.compile('quadraticflag (.*?)(?=\n|$)', re.S)
+        rcut_pattern = re.compile(r'rcutfac (.*?)\n', re.S)
+        twojmax_pattern = re.compile(r'twojmax (\d*)\n', re.S)
+        rfac_pattern = re.compile(r'rfac0 (.*?)\n', re.S)
+        rmin_pattern = re.compile(r'rmin0 (.*?)\n', re.S)
+        diagonalstyle_pattern = re.compile(r'diagonalstyle (.*?)\n', re.S)
+        quadratic_pattern = re.compile(r'quadraticflag (.*?)(?=\n|$)', re.S)
 
         with zopen(param_file, 'rt') as f:
             param_lines = f.read()

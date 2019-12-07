@@ -2,7 +2,6 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-import sys
 import warnings
 from monty.json import MSONable
 from sklearn.externals import joblib

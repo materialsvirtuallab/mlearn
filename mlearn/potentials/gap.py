@@ -249,7 +249,6 @@ class GAPotential(Potential):
                                 'cutoff_transition_width', 'delta', 'f0', 'n_sparse',
                                 'covariance_type', 'sparse_method']
         preprocess_params = ['sparse_jitter', 'e0', 'e0_offset']
-        target_for_training = ['use_energies', 'use_forces', 'use_stress']
         if len(default_sigma) != 4:
             raise ValueError("The default sigma is supposed to have 4 numbers.")
 
@@ -379,8 +378,7 @@ class GAPotential(Potential):
                 exe_command.append("virial=T")
 
             p = subprocess.Popen(exe_command, stdout=open(predict_file, 'w'))
-            stdout = p.communicate()[0]
-            rc = p.returncode
+            p.communicate()[0]
 
             _, df_predict = self.read_cfgs(predict_file, predict=True)
 

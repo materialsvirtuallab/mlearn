@@ -10,7 +10,6 @@ import unittest
 
 import numpy as np
 import pandas as pd
-from pymatgen import Structure
 from monty.json import MSONable
 
 from mlearn.models import LinearModel, GaussianProcessRegressionModel

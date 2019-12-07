@@ -8,7 +8,6 @@ import unittest
 import tempfile
 
 import numpy as np
-from monty.io import zopen
 from pymatgen import Structure
 from monty.os.path import which
 from monty.serialization import loadfn

@@ -2,16 +2,10 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
-from __future__ import division, print_function, unicode_literals, \
-    absolute_import
-
-import os
-import random
 import unittest
-import tempfile
 import numpy as np
 from monty.os.path import which
-from pymatgen import Lattice, Structure, Element
+from pymatgen import Lattice, Structure
 
 from mlearn.describers import BispectrumCoefficients
 

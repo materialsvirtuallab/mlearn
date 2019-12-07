@@ -44,7 +44,7 @@ jobs:
             pip install --quiet -e .
             mkdir coverage_reports
             pytest --cov=mlearn --cov-report html:coverage_reports mlearn
-            coveralls
+            # coveralls
           no_output_timeout: 3600
       - store_artifacts:
           path: coverage_reports/

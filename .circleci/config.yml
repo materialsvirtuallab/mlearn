@@ -1,5 +1,31 @@
 version: 2
 jobs:
+  lint:
+    working_directory: ~/mlearn
+    docker:
+      - image: materialsvirtuallab/circle-ci-pmg-py3:3.7.3
+    steps:
+      - checkout
+      - run:
+          command: |
+            pip install --quiet pycodestyle flake8 mypy pydocstyle pylint
+            echo "Checks will be performed in the order of pycodestyle -> flake8 -> mypy -> pydocstyle "
+            echo "pycodestyle checks..."
+            pycodestyle mlearn
+            echo "--- Done ---"
+            echo "flake8 checks..."
+            flake8 --count --show-source --statistics mlearn
+            # exit-zero treats all errors as warnings.
+            flake8 --count --exit-zero --max-complexity=20 --statistics mlearn
+            echo "--- Done ---"
+            echo "mypy checks..."
+            mypy mlearn
+            echo "--- Done ---"
+            pydocstyle --count mlearn
+            echo "--- Done ---"
+            echo "pylint checks..."
+            pylint --exit-zero mlearn
+            echo "--- Done ---"
   py3test:
     working_directory: ~/mlearn
     docker:
@@ -36,3 +62,4 @@ workflows:
   build_and_test:
     jobs:
       - py3test
+      - lint

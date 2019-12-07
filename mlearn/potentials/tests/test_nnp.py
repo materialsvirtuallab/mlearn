@@ -19,6 +19,7 @@ input_file = os.path.join(os.path.dirname(__file__), 'NNP', 'input.nn')
 scaling_file = os.path.join(os.path.dirname(__file__), 'NNP', 'scaling.data')
 weights_file = os.path.join(os.path.dirname(__file__), 'NNP', 'weights.data')
 
+
 class NNPitentialTest(unittest.TestCase):
 
     @classmethod
@@ -110,6 +111,7 @@ class NNPitentialTest(unittest.TestCase):
     def test_from_config(self):
         nnp = NNPotential.from_config(input_file, scaling_file, weights_file)
         self.assertTrue(nnp.fitted)
+
 
 if __name__ == '__main__':
     unittest.main()

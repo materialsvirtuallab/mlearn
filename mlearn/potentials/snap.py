@@ -21,6 +21,7 @@ class SNAPotential(Potential):
 
     pair_style = 'pair_style        snap'
     pair_coeff = 'pair_coeff        * * {coeff_file} {elements} {param_file} {specie}'
+
     def __init__(self, model, name=None):
         """
         Initialize the SNAPotential Potential with atomic describer
@@ -123,8 +124,8 @@ class SNAPotential(Potential):
         coeff_lines.append('{} {}'.format(ne, nbc + 1))
         for element, coeff in zip(elements, np.split(model.coef, ne)):
             coeff_lines.append('{} {} {}'.format(element,
-                                profile[element]['r'],
-                                profile[element]['w']))
+                                                 profile[element]['r'],
+                                                 profile[element]['w']))
             coeff_lines.extend([str(c) for c in coeff])
         with open(coeff_file, 'w') as f:
             f.write('\n'.join(coeff_lines))
@@ -132,7 +133,7 @@ class SNAPotential(Potential):
         param_lines = []
         keys = ['rcutfac', 'twojmax', 'rfac0', 'rmin0', 'diagonalstyle']
         param_lines.extend(['{} {}'.format(k, getattr(describer, k))
-                                    for k in keys])
+                            for k in keys])
         param_lines.append('quadraticflag {}'.format(int(describer.quadratic)))
         param_lines.append('bzeroflag 0')
         with open(param_file, 'w') as f:
@@ -204,6 +205,6 @@ class SNAPotential(Potential):
         model = LinearModel(describer=describer, **kwargs)
         model.model.coef_ = np.array(coeff_lines[2:], dtype=np.float)
         model.model.intercept_ = 0
-        snap =  SNAPotential(model=model)
+        snap = SNAPotential(model=model)
         snap.specie = Element(specie)
         return snap

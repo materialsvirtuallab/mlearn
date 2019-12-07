@@ -25,6 +25,7 @@ from mlearn.potentials.lammps.calcs import EnergyForceStress
 module_dir = os.path.dirname(__file__)
 NNinput_params = loadfn(os.path.join(module_dir, 'params', 'NNinput.json'))
 
+
 class NNPotential(Potential):
     """
     This class implements Neural Network Potential.
@@ -34,6 +35,7 @@ class NNPotential(Potential):
     pair_style = 'pair_style        nnp dir "./" showew no showewsum 0 ' \
                  'maxew 10000000 resetew yes cflength 1.8897261328 cfenergy 0.0367493254'
     pair_coeff = 'pair_coeff        * * {}'
+
     def __init__(self, name=None, param=None, weight_param=None, scaling_param=None):
         """
 
@@ -71,10 +73,10 @@ class NNPotential(Potential):
         if len(structure.symbol_set) > 1:
             raise ValueError("Structure is not unary.")
 
-        inputs = OrderedDict(Size=structure.num_sites, \
-                             SuperCell=structure.lattice, \
-                             AtomData=(structure, forces), \
-                             Energy=energy, \
+        inputs = OrderedDict(Size=structure.num_sites,
+                             SuperCell=structure.lattice,
+                             AtomData=(structure, forces),
+                             Energy=energy,
                              Stress=virial_stress)
 
         lines = ['begin']
@@ -87,9 +89,9 @@ class NNPotential(Potential):
             format_float = \
                 'atom{:>16.9f}{:>16.9f}{:>16.9f}{:>4s}{:>15.9f}{:>15.9f}{:>15.9f}{:>15.9f}{:>15.9f}'
             for i, (site, force) in enumerate(zip(structure, forces)):
-                lines.append(format_float.format(*site.coords / self.bohr_to_angstrom, \
-                                site.species_string, 0.0, 0.0,
-                                *np.array(force) * self.eV_to_Ha * self.bohr_to_angstrom))
+                lines.append(format_float.format(*site.coords / self.bohr_to_angstrom,
+                                                 site.species_string, 0.0, 0.0,
+                                                 *np.array(force) * self.eV_to_Ha * self.bohr_to_angstrom))
         if 'Energy' in inputs:
             lines.append('energy  {:f}'.format(energy * self.eV_to_Ha))
 
@@ -227,7 +229,7 @@ class NNPotential(Potential):
         type2_format = 'symfunction_short {central_atom}  2 {neighbor_atom}' \
                        '    {r_eta:.7f}    {rs:.7f}    {rcut:.7f}'
         type3_format = 'symfunction_short {central_atom}  3 {neighbor_atom1} ' \
-                       '{neighbor_atom2}    {a_eta:.7f} {lambd:>2d} {zeta:.7f}   '\
+                       '{neighbor_atom2}    {a_eta:.7f} {lambd:>2d} {zeta:.7f}   ' \
                        '{rcut:.7f}'
 
         specie = self.specie.name
@@ -250,7 +252,7 @@ class NNPotential(Potential):
         if self.fitted:
             if self.param.get('atom_energy'):
                 lines.append(head_formatter.format('atom_energy',
-                                value=' '.join([specie, str(self.param.get('atom_energy'))])))
+                                                   value=' '.join([specie, str(self.param.get('atom_energy'))])))
             for tag in PARAMS.get('general'):
                 if tag == 'scale_features':
                     lines.append(NNinput_params.get('general').get(tag).get(self.param.get(tag)))
@@ -262,8 +264,7 @@ class NNPotential(Potential):
                     lines.append(head_formatter.format('global_nodes_short',
                                                        value=' '.join([str(i) for i in layers])))
                     lines.append(head_formatter.format('global_activation_short',
-                                                       value=' '.join([activations] \
-                                                        * len(layers) + ['l'])))
+                                                       value=' '.join([activations] * len(layers) + ['l'])))
                 else:
                     lines.append(head_formatter.format(tag, value=self.param.get(tag)))
             if self.normalized_nodes:
@@ -286,7 +287,7 @@ class NNPotential(Potential):
                                                  r_eta=r_eta, rs=rs, rcut=r_cut))
 
             for a_eta, lambd, zeta in itertools.product(self.param.get('a_etas'),
-                                                        self.param.get('lambdas'), \
+                                                        self.param.get('lambdas'),
                                                         self.param.get('zetas')):
                 lines.append(type3_format.format(central_atom=central_atom,
                                                  neighbor_atom1=neighbor_atom1,
@@ -296,7 +297,7 @@ class NNPotential(Potential):
         else:
             if kwargs.get('atom_energy'):
                 lines.append(head_formatter.format('atom_energy',
-                                value=' '.join([specie, str(kwargs.get('atom_energy'))])))
+                                                   value=' '.join([specie, str(kwargs.get('atom_energy'))])))
                 self.param.update({'atom_energy': kwargs.get('atom_energy')})
             for tag in PARAMS.get('general'):
                 if tag == 'scale_features':
@@ -304,22 +305,20 @@ class NNPotential(Potential):
                     lines.append(NNinput_params.get('general').get(tag).get(value))
                     self.param.update({tag: value})
                 elif tag == 'hidden_layers':
-                    layers = kwargs.get(tag) if kwargs.get(tag) is not None \
-                            else NNinput_params.get('general').get(tag)
+                    layers = kwargs.get(tag, NNinput_params.get('general').get(tag))
                     self.param.update({tag: layers})
-                    activations = kwargs.get('activations') if kwargs.get('activations') \
-                            is not None else NNinput_params.get('general').get('activations')
+                    activations = kwargs.get('activations', NNinput_params.get('general').get(
+                        'activations'))
                     self.param.update({'activations': activations})
                     lines.append(head_formatter.format('global_hidden_layers_short',
                                                        value=len(layers)))
                     lines.append(head_formatter.format('global_nodes_short',
                                                        value=' '.join([str(i) for i in layers])))
                     lines.append(head_formatter.format('global_activation_short',
-                                                       value=' '.join([activations] * len(layers) \
+                                                       value=' '.join([activations] * len(layers)
                                                                       + ['l'])))
                 else:
-                    value = kwargs.get(tag) if kwargs.get(tag) is not None \
-                                else NNinput_params.get('general').get(tag)
+                    value = kwargs.get(tag, NNinput_params.get('general').get(tag))
                     lines.append(head_formatter.format(tag, value=value))
                     self.param.update({tag: value})
             if kwargs.get('normalize_nodes'):
@@ -327,8 +326,7 @@ class NNPotential(Potential):
                 self.param.update({'normalize_nodes': True})
 
             for tag in PARAMS.get('additional'):
-                value = kwargs.get(tag) if kwargs.get(tag) is not None \
-                            else NNinput_params.get('additional').get(tag)
+                value = kwargs.get(tag, NNinput_params.get('additional').get(tag))
                 lines.append(head_formatter.format(tag, value=value))
                 self.param.update({tag: value})
             lines.append('use_short_forces')
@@ -336,25 +334,25 @@ class NNPotential(Potential):
             central_atom, neighbor_atom1, neighbor_atom2 = specie, specie, specie
 
             r_cut = kwargs.get('r_cut') if kwargs.get('r_cut') is not None \
-                            else NNinput_params.get('symmetry_function').get('r_cut')
+                else NNinput_params.get('symmetry_function').get('r_cut')
             self.param.update({'r_cut': r_cut})
             r_cut /= self.bohr_to_angstrom
             r_etas = kwargs.get('r_etas') if kwargs.get('r_etas') is not None \
-                            else NNinput_params.get('symmetry_function').get('r_etas')
+                else NNinput_params.get('symmetry_function').get('r_etas')
             self.param.update({'r_etas': r_etas})
             r_shift = kwargs.get('r_shift') if kwargs.get('r_shift') is not None \
-                            else NNinput_params.get('symmetry_function').get('r_shift')
+                else NNinput_params.get('symmetry_function').get('r_shift')
             self.param.update({'r_shift': r_shift})
             r_shift = np.array(r_shift)
             r_shift /= self.bohr_to_angstrom
             a_etas = kwargs.get('a_etas') if kwargs.get('a_etas') is not None \
-                            else NNinput_params.get('symmetry_function').get('a_etas')
+                else NNinput_params.get('symmetry_function').get('a_etas')
             self.param.update({'a_etas': a_etas})
             zetas = kwargs.get('zetas') if kwargs.get('zetas') is not None \
-                            else NNinput_params.get('symmetry_function').get('zetas')
+                else NNinput_params.get('symmetry_function').get('zetas')
             self.param.update({'zetas': zetas})
-            lambdas= kwargs.get('lambdas') if kwargs.get('lambdas') is not None \
-                            else NNinput_params.get('symmetry_function').get('lambdas')
+            lambdas = kwargs.get('lambdas') if kwargs.get('lambdas') is not None \
+                else NNinput_params.get('symmetry_function').get('lambdas')
             self.param.update({'lambdas': lambdas})
 
             for r_eta, rs in itertools.product(r_etas, r_shift):
@@ -401,7 +399,7 @@ class NNPotential(Potential):
                                  'kalman_q0', 'kalman_qtau', 'kalman_qmin', 'kalman_eta',
                                  'kalman_etatau', 'kalman_etamax']}
         str_formatify = lambda string: float(string) if '.' in string or 'e' in string \
-                            else int(string)
+            else int(string)
         param = {}
         with open(filename, 'r') as f:
             lines = f.readlines()
@@ -419,7 +417,7 @@ class NNPotential(Potential):
                 param.update({'scale_features': scale_features})
             elif tag == 'hidden_layers':
                 hidden_layers = [int(neuron) for neuron in np.array(df[df[0] \
-                                    == 'global_nodes_short'])[0][1:] if neuron]
+                                                                       == 'global_nodes_short'])[0][1:] if neuron]
                 param.update({'hidden_layers': hidden_layers})
                 activations = np.array(df[df[0] == 'global_activation_short'])[0][1]
                 param.update({'activations': activations})
@@ -519,10 +517,10 @@ class NNPotential(Potential):
         energy_pattern = re.compile('energy(.*?)\n')
 
         for block in block_pattern.findall(lines):
-            d = {'outputs':{}}
+            d = {'outputs': {}}
             lattice_str = lattice_pattern.findall(block)
             lattice = Lattice(np.array([latt.split() for latt in lattice_str],
-                                        dtype=np.float) * self.bohr_to_angstrom)
+                                       dtype=np.float) * self.bohr_to_angstrom)
             position_str = position_pattern.findall(block)
             positions = pd.DataFrame([pos.split() for pos in position_str])
             positions.columns = \
@@ -579,7 +577,7 @@ class NNPotential(Potential):
         return ff_settings
 
     def train(self, train_structures, energies=None, forces=None, stresses=None,
-                                    **kwargs):
+              **kwargs):
         """
         Training data with moment tensor method.
 
@@ -622,7 +620,7 @@ class NNPotential(Potential):
                     error_line = [i for i, m in enumerate(msg)
                                   if m.startswith('ERROR')][0]
                     error_msg += ', '.join([e for e in msg[error_line:]])
-                except:
+                except Exception:
                     error_msg += msg[-1]
                 raise RuntimeError(error_msg)
 
@@ -632,11 +630,11 @@ class NNPotential(Potential):
             energy_rmse_pattern = re.compile('ENERGY\s*\S*\s*(\S*)\s*(\S*).*?\n')
             forces_rmse_pattern = re.compile('FORCES\s*\S*\s*(\S*)\s*(\S*).*?\n')
             self.train_energy_rmse, self.validation_energy_rmse = \
-                    np.array([line for line in energy_rmse_pattern.findall(error_lines)],
-                             dtype=np.float).T
+                np.array([line for line in energy_rmse_pattern.findall(error_lines)],
+                         dtype=np.float).T
             self.train_forces_rmse, self.validation_forces_rmse = \
-                    np.array([line for line in forces_rmse_pattern.findall(error_lines)],
-                             dtype=np.float).T
+                np.array([line for line in forces_rmse_pattern.findall(error_lines)],
+                         dtype=np.float).T
 
             weights_filename_pattern = 'weights*{}.out'.format(self.param.get('epochs'))
             weights_filename = glob.glob(weights_filename_pattern)[0]
@@ -692,7 +690,7 @@ class NNPotential(Potential):
                         error_line = [i for i, m in enumerate(msg)
                                       if m.startswith('ERROR')][0]
                         error_msg += ', '.join([e for e in msg[error_line:]])
-                    except:
+                    except Exception:
                         error_msg += msg[-1]
                     raise RuntimeError(error_msg)
 

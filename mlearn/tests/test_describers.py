@@ -15,6 +15,7 @@ from pymatgen import Lattice, Structure, Element
 
 from mlearn.describers import BispectrumCoefficients
 
+
 class BispectrumCoefficientsTest(unittest.TestCase):
 
     @staticmethod
@@ -84,6 +85,7 @@ class BispectrumCoefficientsTest(unittest.TestCase):
                     s.composition.fractional_composition[specie])
                 np.testing.assert_array_equal(df_s[specie, 'n'][1:],
                                               np.zeros(len(s) * 3 + 6))
+
 
 if __name__ == "__main__":
     unittest.main()

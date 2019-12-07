@@ -21,6 +21,7 @@ test_datapool = loadfn(os.path.join(os.path.dirname(__file__), 'datapool.json'))
 coeff_file = os.path.join(os.path.dirname(__file__), 'SNAP', 'SNAPotential.snapcoeff')
 param_file = os.path.join(os.path.dirname(__file__), 'SNAP', 'SNAPotential.snapparam')
 
+
 @unittest.skipIf(not which('lmp_serial'), 'No LAMMPS cmd found.')
 class SNAPotentialTest(unittest.TestCase):
 
@@ -116,6 +117,7 @@ class SNAPotentialTest(unittest.TestCase):
     def test_from_config(self):
         snap = SNAPotential.from_config(param_file, coeff_file)
         self.assertTrue(getattr(snap.model.model, 'coef_') is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

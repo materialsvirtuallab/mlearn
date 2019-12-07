@@ -17,6 +17,7 @@ CWD = os.getcwd()
 test_datapool = loadfn(os.path.join(os.path.dirname(__file__), 'datapool.json'))
 config_file = os.path.join(os.path.dirname(__file__), 'MTP', 'fitted.mtp')
 
+
 class MTPotentialTest(unittest.TestCase):
 
     @classmethod
@@ -96,6 +97,7 @@ class MTPotentialTest(unittest.TestCase):
     def test_from_config(self):
         mtp = MTPotential.from_config(config_file)
         self.assertIsNotNone(mtp.param)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -235,15 +235,15 @@ class GAPotential(Potential):
                     the average atomic energy of the input data or the e0
                     specified manually. Default to 0.0.
         """
-        if not which('teach_sparse'):
-            raise RuntimeError("teach_sparse has not been found.\n",
+        if not which('gap_fit'):
+            raise RuntimeError("gap_fit has not been found.\n",
                                "Please refer to https://github.com/libAtoms/QUIP for ",
                                "further detail.")
         atoms_filename = 'train.xyz'
         xml_filename = 'train.xml'
         train_pool = pool_from(train_structures, energies, forces, stresses)
 
-        exe_command = ["teach_sparse"]
+        exe_command = ["gap_fit"]
         exe_command.append('at_file={}'.format(atoms_filename))
         gap_configure_params = ['l_max', 'n_max', 'atom_sigma', 'zeta', 'cutoff',
                                 'cutoff_transition_width', 'delta', 'f0', 'n_sparse',
@@ -322,7 +322,7 @@ class GAPotential(Potential):
         gpcoordinates = list(root.iter('gpCoordinates'))[0]
         param_filename = "{}.soapparam".format(self.name)
         gpcoordinates.set('sparseX_filename', param_filename)
-        np.savetxt(param_filename, self.param.get('param'))
+        np.savetxt(param_filename, self.param.get('param'), fmt='%.20e')
         tree.write(xml_filename)
         pair_coeff = self.pair_coeff.format(xml_filename,
                                             '\"Potential xml_label={}\"'.

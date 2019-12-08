@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This module provides basic LAMMPS calculator classes."""
+
 from __future__ import division, print_function, unicode_literals, \
     absolute_import
 
@@ -390,6 +392,9 @@ class ElasticConstant(LMPStaticCalculator):
         return input_file
 
     def calculate(self):
+        """
+        Calculate the elastic constant given Potential class.
+        """
         with ScratchDir('.'):
             input_file = self._setup()
             p = subprocess.Popen([self.LMP_EXE, '-in', input_file],
@@ -619,6 +624,9 @@ class NudgedElasticBand(LMPStaticCalculator):
         return input_file
 
     def calculate(self):
+        """
+        Calculate the NEB barrier given Potential class.
+        """
         with ScratchDir('.'):
             input_file = self._setup()
             p = subprocess.Popen(['mpirun', '-n', str(self.num_replicas),
@@ -743,6 +751,9 @@ class DefectFormation(LMPStaticCalculator):
         return input_file, energy_per_atom, len(super_cell) - 1
 
     def calculate(self):
+        """
+        Calculate the vacancy formation given Potential class.
+        """
         with ScratchDir('.'):
             input_file, energy_per_atom, num_atoms = self._setup()
             p = subprocess.Popen([self.LMP_EXE, '-in', input_file], stdout=subprocess.PIPE)

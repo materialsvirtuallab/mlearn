@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This module provides machine learning models."""
+
 import warnings
 from monty.json import MSONable
 from sklearn.externals import joblib
@@ -98,16 +100,34 @@ class LinearModel(BaseEstimator, MSONable):
 
     @property
     def coef(self):
+        """
+        Returns coefficients of the model.
+        """
         return self.model.coef_
 
     @property
     def intercept(self):
+        """
+        Returns intercept of the model.
+        """
         return self.model.intercept_
 
     def save(self, model_fname):
+        """
+        Save the model into file.
+
+        Args:
+            model_fname (str): Filename of the model.
+        """
         joblib.dump(self.model, '%s.pkl' % model_fname)
 
     def load(self, model_fname):
+        """
+        Load the model from the file.
+
+        Args:
+            model_fname (str): Filename of the model.
+        """
         self.model = joblib.load(model_fname)
 
 
@@ -184,10 +204,25 @@ class GaussianProcessRegressionModel(BaseEstimator, MSONable):
 
     @property
     def params(self):
+        """
+        Returns the parameters of the model.
+        """
         return self.model.get_params()
 
     def save(self, model_fname):
+        """
+        Save the model into file.
+
+        Args:
+            model_fname (str): Filename of the model.
+        """
         joblib.dump(self.model, '%s.pkl' % model_fname)
 
     def load(self, model_fname):
+        """
+        Load the model from the file.
+
+        Args:
+            model_fname (str): Filename of the model.
+        """
         self.model = joblib.load(model_fname)

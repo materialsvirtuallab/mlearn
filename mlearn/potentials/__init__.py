@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This package contains Potential classes representing Interatomic Potentials."""
+
 import abc
 import six
 from monty.json import MSONable

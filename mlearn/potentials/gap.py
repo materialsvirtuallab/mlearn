@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This module provides SOAP-GAP interatomic potential class."""
+
 import re
 import os
 import ruamel.yaml as yaml
@@ -90,6 +92,14 @@ class GAPotential(Potential):
         return '\n'.join(lines)
 
     def write_cfgs(self, filename, cfg_pool):
+        """
+        Write the formatted configuration file.
+
+        Args:
+            filename (str): The filename to be written.
+            cfg_pool (list): The configuration pool contains
+                structure and energy/forces properties.
+        """
         if not filename.endswith('.xyz'):
             raise RuntimeError('The extended xyz file should end with ".xyz"')
 
@@ -114,6 +124,8 @@ class GAPotential(Potential):
 
     def read_cfgs(self, filename, predict=False):
         """
+        Read the configuration file.
+
         Args:
             filename (str): The configuration file to be read.
         """

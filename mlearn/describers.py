@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This module provides local environment describers."""
+
 import itertools
 
 import numpy as np

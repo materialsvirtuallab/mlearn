@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This module provides NNP interatomic potential class."""
+
 import re
 import os
 import glob
@@ -101,7 +103,14 @@ class NNPotential(Potential):
         return '\n'.join(lines)
 
     def write_cfgs(self, filename, cfg_pool):
+        """
+        Write the formatted configuration file.
 
+        Args:
+            filename (str): The filename to be written.
+            cfg_pool (list): The configuration pool contains
+                structure and energy/forces properties.
+        """
         lines = []
         for dataset in cfg_pool:
             if isinstance(dataset['structure'], dict):
@@ -503,6 +512,8 @@ class NNPotential(Potential):
 
     def read_cfgs(self, filename='output.data'):
         """
+        Read the configuration file.
+
         Args:
             filename (str): The configuration file to be read.
         """

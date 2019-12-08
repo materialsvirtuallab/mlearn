@@ -2,6 +2,8 @@
 # Copyright (c) Materials Virtual Lab
 # Distributed under the terms of the BSD License.
 
+"""This module provides function to process data and unify the data format."""
+
 import numpy as np
 import pandas as pd
 from pymatgen import Structure

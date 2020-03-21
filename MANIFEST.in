@@ -1,0 +1,4 @@
+include *.md requirements*.txt
+recursive-include mlearn *.py *.json *.yaml *.md
+recursive-include mvl_models * 
+recursive-include mlearn/potentials/lammps in.* *.template

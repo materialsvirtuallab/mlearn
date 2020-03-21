@@ -6,6 +6,7 @@ this_dir = abspath(dirname(__file__))
 with open(join(this_dir, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+
 setup(
     name='mlearn',
     version='0.1.0',
@@ -18,8 +19,9 @@ setup(
                       'pandas'],
     packages=find_packages(),
     package_data={
-        "mlearn": ["*.json", "*.md"]
+        "mlearn": ["*.json", "*.md"],
     },
+	include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",

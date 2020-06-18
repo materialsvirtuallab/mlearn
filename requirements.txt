@@ -1,4 +1,4 @@
-pandas==1.0.4
+pandas==1.0.5
 pymatgen==2020.6.8
 scikit-learn==0.22.2.post1
 numpy==1.18.5

@@ -3,4 +3,4 @@ pymatgen==2020.8.13
 scikit-learn==0.22.2.post1
 numpy==1.19.1
 monty==4.0.0
-ruamel.yaml==0.16.11
+ruamel.yaml==0.16.12

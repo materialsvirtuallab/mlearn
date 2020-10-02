@@ -1,5 +1,10 @@
 # mlearn
 
+NOTE: This package has been deprecated and all code has been moved to the 
+updated [maml](https://github.com/materialsvirtuallab/maml) package. Please
+use maml from henceforth. This package is retained for reference but it is
+archived and will no longer be updated or maintained.
+
 The mlearn package is a benchmark suite for machine learning interatomic 
 potentials for materials science. It enables a seamless way to develop 
 various potentials and provides LAMMPS-driven properties predictor with 

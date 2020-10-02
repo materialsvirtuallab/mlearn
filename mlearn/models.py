@@ -6,7 +6,7 @@
 
 import warnings
 from monty.json import MSONable
-from sklearn.externals import joblib
+import joblib
 from sklearn.base import BaseEstimator
 from sklearn.gaussian_process import kernels
 from sklearn.gaussian_process import GaussianProcessRegressor

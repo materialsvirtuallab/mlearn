@@ -21,7 +21,7 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
     """
 
     def __init__(self, rcutfac, twojmax, element_profile, rfac0=0.99363,
-                 rmin0=0, diagonalstyle=3, quadratic=False, pot_fit=False):
+                 rmin0=0, quadratic=False, pot_fit=False):
         """
 
         Args:
@@ -35,9 +35,6 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
                 Set between (0, 1), default to 0.99363.
             rmin0 (float): Parameter in distance to angle conversion.
                 Default to 0.
-            diagonalstyle (int): Parameter defining which bispectrum
-                components are generated. Choose among 0, 1, 2 and 3,
-                default to 3.
             quadratic (bool): Whether including quadratic terms.
                 Default to False.
             pot_fit (bool): Whether to output in potentials fitting
@@ -49,14 +46,12 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
         self.calculator = SpectralNeighborAnalysis(rcutfac, twojmax,
                                                    element_profile,
                                                    rfac0, rmin0,
-                                                   diagonalstyle,
                                                    quadratic)
         self.rcutfac = rcutfac
         self.twojmax = twojmax
         self.element_profile = element_profile
         self.rfac0 = rfac0
         self.rmin0 = rmin0
-        self.diagonalstyle = diagonalstyle
         self.elements = sorted(element_profile.keys(),
                                key=lambda sym: get_el_sp(sym).X)
         self.quadratic = quadratic
@@ -69,8 +64,7 @@ class BispectrumCoefficients(BaseEstimator, MSONable, TransformerMixin):
         involved.
 
         """
-        return self.calculator.get_bs_subscripts(self.twojmax,
-                                                 self.diagonalstyle)
+        return self.calculator.get_bs_subscripts(self.twojmax)
 
     def describe(self, structure, include_stress=False):
         """

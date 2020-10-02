@@ -21,7 +21,7 @@ class SNAPotential(Potential):
     """
 
     pair_style = 'pair_style        snap'
-    pair_coeff = 'pair_coeff        * * {coeff_file} {elements} {param_file} {specie}'
+    pair_coeff = 'pair_coeff        * * {coeff_file} {param_file} {elements} {specie}'
 
     def __init__(self, model, name=None):
         """
@@ -130,7 +130,7 @@ class SNAPotential(Potential):
             f.write('\n'.join(coeff_lines))
 
         param_lines = []
-        keys = ['rcutfac', 'twojmax', 'rfac0', 'rmin0', 'diagonalstyle']
+        keys = ['rcutfac', 'twojmax', 'rfac0', 'rmin0']
         param_lines.extend(['{} {}'.format(k, getattr(describer, k))
                             for k in keys])
         param_lines.append('quadraticflag {}'.format(int(describer.quadratic)))
@@ -181,7 +181,6 @@ class SNAPotential(Potential):
         twojmax_pattern = re.compile(r'twojmax (\d*)\n', re.S)
         rfac_pattern = re.compile(r'rfac0 (.*?)\n', re.S)
         rmin_pattern = re.compile(r'rmin0 (.*?)\n', re.S)
-        diagonalstyle_pattern = re.compile(r'diagonalstyle (.*?)\n', re.S)
         quadratic_pattern = re.compile(r'quadraticflag (.*?)(?=\n|$)', re.S)
 
         with zopen(param_file, 'rt') as f:
@@ -191,7 +190,6 @@ class SNAPotential(Potential):
         twojmax = int(twojmax_pattern.findall(param_lines)[-1])
         rfac = float(rfac_pattern.findall(param_lines)[-1])
         rmin = int(rmin_pattern.findall(param_lines)[-1])
-        diagonal = int(diagonalstyle_pattern.findall(param_lines)[-1])
         if quadratic_pattern.findall(param_lines):
             quadratic = bool(int(quadratic_pattern.findall(param_lines)[-1]))
         else:
@@ -199,7 +197,7 @@ class SNAPotential(Potential):
 
         describer = BispectrumCoefficients(rcutfac=rcut, twojmax=twojmax,
                                            rfac0=rfac, element_profile=element_profile,
-                                           rmin0=rmin, diagonalstyle=diagonal, quadratic=quadratic,
+                                           rmin0=rmin, quadratic=quadratic,
                                            pot_fit=True)
         model = LinearModel(describer=describer, **kwargs)
         model.model.coef_ = np.array(coeff_lines[2:], dtype=np.float)

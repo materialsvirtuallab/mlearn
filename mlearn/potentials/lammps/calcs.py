@@ -193,7 +193,7 @@ class SpectralNeighborAnalysis(LMPStaticCalculator):
              'dump 4 all custom 1 dump.snav c_snav[*]']
 
     def __init__(self, rcutfac, twojmax, element_profile, rfac0=0.99363,
-                 rmin0=0, diagonalstyle=3, quadratic=False):
+                 rmin0=0, quadratic=False):
         """
         For more details on the parameters, please refer to the
         official documentation of LAMMPS.
@@ -217,9 +217,6 @@ class SpectralNeighborAnalysis(LMPStaticCalculator):
                 Set between (0, 1), default to 0.99363.
             rmin0 (float): Parameter in distance to angle conversion.
                 Default to 0.
-            diagonalstyle (int): Parameter defining which bispectrum
-                components are generated. Choose among 0, 1, 2 and 3,
-                default to 3.
             quadratic (bool): Whether including quadratic terms.
                 Default to False.
 
@@ -229,21 +226,16 @@ class SpectralNeighborAnalysis(LMPStaticCalculator):
         self.element_profile = element_profile
         self.rfac0 = rfac0
         self.rmin0 = rmin0
-        assert diagonalstyle in range(4), 'Invalid diagonalstype, ' \
-                                          'choose among 0, 1, 2 and 3'
-        self.diagonalstyle = diagonalstyle
         self.quadratic = quadratic
 
     @staticmethod
-    def get_bs_subscripts(twojmax, diagonal):
+    def get_bs_subscripts(twojmax):
         """
         Method to list the subscripts 2j1, 2j2, 2j of bispectrum
         components.
 
         Args:
             twojmax (int): Band limit for bispectrum components.
-            diagonal (int): Parameter defining which bispectrum
-            components are generated. Choose among 0, 1, 2 and 3.
 
         Returns:
             List of all subscripts [2j1, 2j2, 2j].
@@ -251,19 +243,12 @@ class SpectralNeighborAnalysis(LMPStaticCalculator):
         """
         subs = itertools.product(range(twojmax + 1), repeat=3)
         filters = [lambda x: True if x[0] >= x[1] else False]
-        if diagonal == 2:
-            filters.append(lambda x: True if x[0] == x[1] == x[2] else False)
-        else:
-            if diagonal == 1:
-                filters.append(lambda x: True if x[0] == x[1] else False)
-            elif diagonal == 3:
-                filters.append(lambda x: True if x[2] >= x[0] else False)
-            elif diagonal == 0:
-                pass
-            j_filter = lambda x: True if \
-                x[2] in range(x[0] - x[1], min(twojmax, x[0] + x[1]) + 1, 2) \
-                else False
-            filters.append(j_filter)
+        filters.append(lambda x: True if x[2] >= x[0] else False)
+        j_filter = lambda x: (True if x[2] 
+                              in range(x[0] - x[1], 
+                                       min(twojmax, x[0] + x[1]) + 1, 2) 
+                              else False)
+        filters.append(j_filter)
         for f in filters:
             subs = filter(f, subs)
         return list(subs)
@@ -274,7 +259,7 @@ class SpectralNeighborAnalysis(LMPStaticCalculator):
         Returns No. of bispectrum components to be calculated.
 
         """
-        return len(self.get_bs_subscripts(self.twojmax, self.diagonalstyle))
+        return len(self.get_bs_subscripts(self.twojmax))
 
     def _setup(self):
         compute_args = '{} {} {} '.format(1, self.rfac0, self.twojmax)
@@ -284,8 +269,8 @@ class SpectralNeighborAnalysis(LMPStaticCalculator):
         weights = [self.element_profile[e]['w'] for e in el_in_seq]
         compute_args += ' '.join([str(p) for p in cutoffs + weights])
         qflag = 1 if self.quadratic else 0
-        compute_args += ' diagonal {} rmin0 {} quadraticflag {}'. \
-            format(self.diagonalstyle, self.rmin0, qflag)
+        compute_args += ' rmin0 {} quadraticflag {}'. \
+            format(self.rmin0, qflag)
         add_args = lambda l: l + compute_args if l.startswith('compute') \
             else l
         CMDS = list(map(add_args, self._CMDS))
